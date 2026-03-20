@@ -1,0 +1,1662 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>GigShield AI — Income Protection for Gig Workers</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Bricolage+Grotesque:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+:root{
+  --brand:#FF6B35;--brand2:#E85D04;--brand-light:#FFF3EE;--brand-mid:#FFD4C2;
+  --blue:#1A56DB;--blue-light:#EBF5FF;
+  --green:#0B9E52;--green-light:#ECFDF5;
+  --red:#DC2626;--red-light:#FEF2F2;
+  --yellow:#D97706;--yellow-light:#FFFBEB;
+  --purple:#7C3AED;--purple-light:#F5F3FF;
+  --gray50:#F9FAFB;--gray100:#F3F4F6;--gray200:#E5E7EB;--gray300:#D1D5DB;
+  --gray400:#9CA3AF;--gray500:#6B7280;--gray600:#4B5563;--gray700:#374151;
+  --gray800:#1F2937;--gray900:#111827;
+  --white:#FFFFFF;
+  --shadow-sm:0 1px 3px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.04);
+  --shadow:0 4px 16px rgba(0,0,0,.08),0 2px 6px rgba(0,0,0,.04);
+  --shadow-md:0 8px 30px rgba(0,0,0,.1),0 4px 12px rgba(0,0,0,.06);
+  --shadow-lg:0 20px 60px rgba(0,0,0,.12),0 8px 24px rgba(0,0,0,.06);
+  --r:10px;--r2:14px;--r3:20px;
+  --font:'Plus Jakarta Sans',sans-serif;
+  --font-display:'Bricolage Grotesque',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--gray50);color:var(--gray900);font-family:var(--font);font-size:14px;line-height:1.6;overflow-x:hidden}
+
+/* ───── LAYOUT ───── */
+.app{display:flex;min-height:100vh}
+.sidebar{width:260px;background:var(--white);border-right:1px solid var(--gray200);display:flex;flex-direction:column;position:fixed;height:100vh;z-index:100;flex-shrink:0}
+.main{margin-left:260px;flex:1;display:flex;flex-direction:column;min-height:100vh}
+
+/* ───── SIDEBAR ───── */
+.logo{padding:22px 20px 18px;border-bottom:1px solid var(--gray100)}
+.logo-wrap{display:flex;align-items:center;gap:10px}
+.logo-badge{width:36px;height:36px;background:linear-gradient(135deg,var(--brand),var(--brand2));border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;box-shadow:0 4px 12px rgba(255,107,53,.35)}
+.logo-name{font-family:var(--font-display);font-size:18px;font-weight:800;color:var(--gray900);letter-spacing:-.3px}
+.logo-tag{font-size:10px;color:var(--gray400);font-weight:500;letter-spacing:.5px;text-transform:uppercase}
+.logo-badge2{display:inline-flex;align-items:center;gap:3px;background:var(--brand-light);color:var(--brand);font-size:9px;font-weight:700;padding:2px 7px;border-radius:20px;margin-top:3px;letter-spacing:.3px}
+
+.nav{padding:16px 12px;flex:1;overflow-y:auto}
+.nav-group{margin-bottom:8px}
+.nav-label{font-size:9px;font-weight:700;color:var(--gray400);letter-spacing:.1em;text-transform:uppercase;padding:4px 10px 6px}
+.nav-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:var(--r);cursor:pointer;color:var(--gray600);font-size:13px;font-weight:500;transition:all .15s;margin-bottom:2px;border:1px solid transparent}
+.nav-item:hover{background:var(--gray50);color:var(--gray800)}
+.nav-item.active{background:var(--brand-light);color:var(--brand);border-color:var(--brand-mid);font-weight:600}
+.nav-item svg{width:16px;height:16px;flex-shrink:0}
+.nav-pip{margin-left:auto;background:var(--red);color:#fff;font-size:9px;padding:2px 6px;border-radius:20px;font-weight:700}
+.nav-pip.orange{background:var(--brand)}
+
+.sidebar-foot{padding:14px;border-top:1px solid var(--gray100)}
+.live-bar{display:flex;align-items:center;gap:8px;padding:10px 12px;background:var(--green-light);border-radius:var(--r);border:1px solid #BBF7D0}
+.live-dot{width:7px;height:7px;border-radius:50%;background:var(--green);animation:pulse 2s infinite}
+.live-text{font-size:11px;color:var(--green);font-weight:600}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(1.4)}}
+
+/* ───── TOPBAR ───── */
+.topbar{background:var(--white);border-bottom:1px solid var(--gray200);padding:0 28px;height:58px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;box-shadow:var(--shadow-sm)}
+.pg-title{font-family:var(--font-display);font-size:17px;font-weight:700;color:var(--gray900)}
+.breadcrumb{font-size:11px;color:var(--gray400);margin-top:1px}
+.topbar-right{display:flex;align-items:center;gap:10px}
+
+/* ───── BUTTONS ───── */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:var(--r);font-size:12px;font-weight:600;cursor:pointer;border:none;transition:all .15s;font-family:var(--font);letter-spacing:.1px}
+.btn-primary{background:linear-gradient(135deg,var(--brand),var(--brand2));color:#fff;box-shadow:0 3px 10px rgba(255,107,53,.35)}
+.btn-primary:hover{transform:translateY(-1px);box-shadow:0 5px 16px rgba(255,107,53,.45)}
+.btn-blue{background:var(--blue);color:#fff;box-shadow:0 3px 10px rgba(26,86,219,.3)}
+.btn-blue:hover{background:#1649C4;transform:translateY(-1px)}
+.btn-outline{background:var(--white);color:var(--gray700);border:1.5px solid var(--gray300)}
+.btn-outline:hover{border-color:var(--brand);color:var(--brand);background:var(--brand-light)}
+.btn-ghost{background:transparent;color:var(--gray500);border:1px solid var(--gray200)}
+.btn-ghost:hover{background:var(--gray50);color:var(--gray700)}
+.btn-success{background:var(--green-light);color:var(--green);border:1px solid #86EFAC}
+.btn-danger{background:var(--red-light);color:var(--red);border:1px solid #FECACA}
+.btn-lg{padding:14px 28px;font-size:15px;border-radius:12px;font-weight:700}
+
+/* ───── CONTENT ───── */
+.content{padding:28px;flex:1}
+.panel{display:none}.panel.active{display:block}
+
+/* ───── CARDS ───── */
+.card{background:var(--white);border:1px solid var(--gray200);border-radius:var(--r2);padding:20px 22px;box-shadow:var(--shadow-sm)}
+.card-highlight{border-color:var(--brand-mid);background:linear-gradient(135deg,#FFFAF8,var(--white))}
+.card-blue{border-color:#BFDBFE;background:linear-gradient(135deg,#EFF6FF,var(--white))}
+
+/* ───── STAT CARDS ───── */
+.stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;margin-bottom:22px}
+.stat-card{background:var(--white);border-radius:var(--r2);padding:18px 20px;border:1px solid var(--gray200);box-shadow:var(--shadow-sm);position:relative;overflow:hidden;transition:box-shadow .15s}
+.stat-card:hover{box-shadow:var(--shadow)}
+.stat-stripe{position:absolute;top:0;left:0;right:0;height:3px;border-radius:var(--r2) var(--r2) 0 0}
+.stat-icon{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;margin-bottom:10px}
+.stat-label{font-size:11px;color:var(--gray500);font-weight:600;text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px}
+.stat-value{font-family:var(--font-display);font-size:26px;font-weight:800;line-height:1;color:var(--gray900)}
+.stat-sub{font-size:11px;color:var(--gray400);margin-top:4px}
+.stat-change{display:inline-flex;align-items:center;gap:3px;font-size:10px;font-weight:600;padding:2px 7px;border-radius:20px;margin-top:5px}
+.up{background:var(--green-light);color:var(--green)}
+.dn{background:var(--red-light);color:var(--red)}
+
+/* ───── TABLES ───── */
+.table-wrap{overflow-x:auto;border-radius:var(--r)}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;padding:10px 14px;font-size:10px;font-weight:700;color:var(--gray500);text-transform:uppercase;letter-spacing:.07em;background:var(--gray50);border-bottom:1px solid var(--gray200)}
+td{padding:12px 14px;border-bottom:1px solid var(--gray100);color:var(--gray700);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:var(--gray50)}
+
+/* ───── BADGES ───── */
+.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:20px;font-size:10px;font-weight:700;letter-spacing:.02em}
+.badge-green{background:var(--green-light);color:var(--green);border:1px solid #BBF7D0}
+.badge-red{background:var(--red-light);color:var(--red);border:1px solid #FECACA}
+.badge-yellow{background:var(--yellow-light);color:var(--yellow);border:1px solid #FDE68A}
+.badge-blue{background:var(--blue-light);color:var(--blue);border:1px solid #BFDBFE}
+.badge-orange{background:var(--brand-light);color:var(--brand);border:1px solid var(--brand-mid)}
+.badge-purple{background:var(--purple-light);color:var(--purple);border:1px solid #DDD6FE}
+.badge-gray{background:var(--gray100);color:var(--gray600);border:1px solid var(--gray200)}
+
+/* ───── GRIDS ───── */
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+.grid-4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:14px}
+.sec-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.sec-title{font-family:var(--font-display);font-size:15px;font-weight:700;color:var(--gray900)}
+.sec-sub{font-size:11px;color:var(--gray400);margin-top:2px}
+
+/* ───── TABS ───── */
+.tabs{display:flex;gap:0;background:var(--gray100);border-radius:var(--r);padding:3px;margin-bottom:20px;width:fit-content}
+.tab{padding:7px 18px;border-radius:8px;border:none;background:transparent;color:var(--gray500);font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;font-family:var(--font)}
+.tab.active{background:var(--white);color:var(--gray900);box-shadow:var(--shadow-sm)}
+
+/* ───── FORM ───── */
+.form-group{margin-bottom:16px}
+.form-label{display:block;font-size:12px;font-weight:600;color:var(--gray600);margin-bottom:6px;letter-spacing:.01em}
+.form-input{width:100%;background:var(--white);border:1.5px solid var(--gray200);border-radius:var(--r);padding:10px 13px;color:var(--gray900);font-family:var(--font);font-size:13px;outline:none;transition:all .15s}
+.form-input:focus{border-color:var(--brand);box-shadow:0 0 0 3px rgba(255,107,53,.1)}
+.form-input::placeholder{color:var(--gray400)}
+select.form-input{cursor:pointer}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.form-hint{font-size:11px;color:var(--gray400);margin-top:4px}
+
+/* ───── PROGRESS ───── */
+.progress-row{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.progress-label{font-size:12px;color:var(--gray600);width:140px;flex-shrink:0;font-weight:500}
+.progress-track{flex:1;height:7px;background:var(--gray100);border-radius:4px;overflow:hidden}
+.progress-fill{height:100%;border-radius:4px;transition:width 1.2s ease}
+.progress-val{font-size:11px;color:var(--gray600);width:45px;text-align:right;font-weight:600}
+
+/* ───── WIIS RING ───── */
+.wiis-ring{position:relative;width:130px;height:130px;margin:0 auto}
+.wiis-ring svg{transform:rotate(-90deg)}
+.wiis-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.wiis-num{font-family:var(--font-display);font-size:32px;font-weight:800;color:var(--brand)}
+.wiis-lbl{font-size:9px;color:var(--gray400);text-transform:uppercase;letter-spacing:.1em}
+
+/* ───── STEP INDICATOR ───── */
+.steps{display:flex;gap:0;margin-bottom:28px}
+.step{flex:1;text-align:center;position:relative}
+.step::after{content:'';position:absolute;top:13px;left:50%;width:100%;height:2px;background:var(--gray200)}
+.step:last-child::after{display:none}
+.step-num{width:28px;height:28px;border-radius:50%;background:var(--gray100);border:2px solid var(--gray300);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;margin:0 auto 5px;position:relative;z-index:1;color:var(--gray500)}
+.step.done .step-num{background:var(--green);border-color:var(--green);color:#fff}
+.step.active .step-num{background:var(--brand);border-color:var(--brand);color:#fff}
+.step-text{font-size:9px;color:var(--gray400);text-transform:uppercase;letter-spacing:.06em;font-weight:600}
+.step.active .step-text,.step.done .step-text{color:var(--gray600)}
+
+/* ───── FEED ITEMS ───── */
+.feed-item{display:flex;align-items:flex-start;gap:11px;padding:11px 0;border-bottom:1px solid var(--gray100);animation:fadeIn .35s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateX(-6px)}to{opacity:1;transform:none}}
+.feed-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:5px}
+.feed-text{font-size:13px;color:var(--gray800);line-height:1.4}
+.feed-time{font-size:10px;color:var(--gray400);font-family:monospace;margin-top:2px}
+
+/* ───── NOTIF ───── */
+.notif{position:fixed;bottom:24px;right:24px;background:var(--white);border:1px solid var(--gray200);border-left:4px solid var(--green);border-radius:var(--r2);padding:16px 20px;max-width:360px;z-index:2000;animation:slideUp .3s ease;box-shadow:var(--shadow-md)}
+@keyframes slideUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+.notif-title{font-weight:700;font-size:13px;color:var(--gray900);margin-bottom:3px}
+.notif-body{font-size:12px;color:var(--gray500);line-height:1.5}
+
+/* ───── CHART ───── */
+.chart-wrap{position:relative;height:230px}
+
+/* ───── DEMO BUTTONS ───── */
+.trigger-btn{width:100%;padding:18px 16px;border-radius:var(--r2);border:2px solid transparent;cursor:pointer;font-family:var(--font-display);font-size:14px;font-weight:700;transition:all .2s;text-align:left;position:relative;overflow:hidden}
+.trigger-btn:hover{transform:translateY(-2px);box-shadow:var(--shadow-md)}
+.trigger-btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
+.trigger-rain{background:linear-gradient(135deg,#1e40af,#1d4ed8);color:#fff;box-shadow:0 4px 16px rgba(29,78,216,.3)}
+.trigger-aqi{background:linear-gradient(135deg,#5b21b6,#7c3aed);color:#fff;box-shadow:0 4px 16px rgba(124,58,237,.3)}
+.trigger-heat{background:linear-gradient(135deg,#b91c1c,#ef4444);color:#fff;box-shadow:0 4px 16px rgba(239,68,68,.3)}
+.trigger-btn .tb-icon{font-size:26px;margin-bottom:6px;display:block}
+.trigger-btn .tb-label{font-size:13px;opacity:.8;font-weight:400;display:block}
+
+/* ───── AI CHAT ───── */
+.chat-box{background:var(--gray50);border-radius:var(--r2);border:1px solid var(--gray200);padding:16px;height:320px;overflow-y:auto;margin-bottom:12px;display:flex;flex-direction:column;gap:10px}
+.msg{max-width:82%;padding:10px 14px;border-radius:var(--r2);font-size:13px;line-height:1.5}
+.msg-user{background:linear-gradient(135deg,var(--brand),var(--brand2));color:#fff;margin-left:auto;border-radius:var(--r2) var(--r2) 4px var(--r2)}
+.msg-ai{background:var(--white);color:var(--gray800);border:1px solid var(--gray200);border-radius:var(--r2) var(--r2) var(--r2) 4px;box-shadow:var(--shadow-sm)}
+.msg-ai strong{color:var(--brand)}
+.msg-loading{display:flex;gap:4px;align-items:center;padding:10px 14px}
+.dot-bounce{width:6px;height:6px;background:var(--gray400);border-radius:50%;animation:bounce 1.2s infinite}
+.dot-bounce:nth-child(2){animation-delay:.2s}
+.dot-bounce:nth-child(3){animation-delay:.4s}
+@keyframes bounce{0%,80%,100%{transform:translateY(0)}40%{transform:translateY(-6px)}}
+.chat-input-row{display:flex;gap:8px}
+.chat-input{flex:1;background:var(--white);border:1.5px solid var(--gray200);border-radius:var(--r);padding:10px 14px;font-family:var(--font);font-size:13px;color:var(--gray900);outline:none;transition:border-color .15s}
+.chat-input:focus{border-color:var(--brand)}
+
+/* ───── HERO / WORKER PAGE ───── */
+.hero-banner{background:linear-gradient(135deg,#FFF5F0,#FFF);border:1px solid var(--brand-mid);border-radius:var(--r3);padding:28px 32px;margin-bottom:22px;position:relative;overflow:hidden}
+.hero-banner::before{content:'🛡️';position:absolute;right:32px;top:50%;transform:translateY(-50%);font-size:80px;opacity:.07}
+.hero-premium-chip{display:inline-flex;align-items:center;gap:6px;background:var(--brand);color:#fff;padding:6px 14px;border-radius:20px;font-size:12px;font-weight:700;margin-bottom:14px}
+.hero-title{font-family:var(--font-display);font-size:28px;font-weight:800;color:var(--gray900);margin-bottom:6px;line-height:1.2}
+.hero-sub{color:var(--gray500);font-size:14px;margin-bottom:20px}
+.hero-stats{display:flex;gap:28px}
+.hs{text-align:center}
+.hs-n{font-family:var(--font-display);font-size:22px;font-weight:800;color:var(--brand)}
+.hs-l{font-size:11px;color:var(--gray500)}
+
+/* ───── SIGNAL GRID ───── */
+.signal-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.signal-item{background:var(--gray50);border:1px solid var(--gray200);border-radius:var(--r);padding:10px 13px}
+.signal-name{font-size:10px;color:var(--gray500);font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px}
+.signal-val{font-size:13px;font-weight:700;color:var(--gray900)}
+
+/* ───── TIER CARD ───── */
+.tier-card{border-radius:var(--r2);padding:16px 18px;text-align:center;border:2px solid transparent;cursor:pointer;transition:all .15s}
+.tier-card.gold{background:linear-gradient(135deg,#FEF3C7,#FFFBEB);border-color:#F59E0B}
+.tier-card.silver{background:linear-gradient(135deg,#F1F5F9,#F8FAFC);border-color:#94A3B8}
+.tier-card.bronze{background:linear-gradient(135deg,#FFF5F0,#FFFAF9);border-color:#F97316}
+
+/* ───── POLICY CARD ───── */
+.policy-card{background:linear-gradient(135deg,var(--brand),var(--brand2));border-radius:var(--r3);padding:24px 26px;color:#fff;position:relative;overflow:hidden}
+.policy-card::after{content:'';position:absolute;right:-20px;top:-20px;width:160px;height:160px;border-radius:50%;background:rgba(255,255,255,.08)}
+.policy-week{font-size:11px;font-weight:600;opacity:.8;letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px}
+.policy-amount{font-family:var(--font-display);font-size:42px;font-weight:800;line-height:1}
+.policy-sub{font-size:12px;opacity:.75;margin-top:4px}
+
+/* ───── RESPONSIVE ───── */
+@media(max-width:900px){.sidebar{display:none}.main{margin-left:0}.grid-2,.grid-3,.grid-4{grid-template-columns:1fr}.stat-grid{grid-template-columns:1fr 1fr}}
+
+/* ───── SCROLLBAR ───── */
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:var(--gray100)}
+::-webkit-scrollbar-thumb{background:var(--gray300);border-radius:2px}
+
+/* ───── RISK METER ───── */
+.risk-meter{height:10px;border-radius:5px;background:linear-gradient(to right,#22C55E,#F59E0B,#EF4444);position:relative;margin:8px 0}
+.risk-marker{position:absolute;top:-3px;width:16px;height:16px;border-radius:50%;background:var(--white);border:3px solid var(--gray800);transform:translateX(-50%);transition:left .8s ease}
+
+/* ───── ALERT BANNER ───── */
+.alert{display:flex;align-items:flex-start;gap:12px;padding:14px 16px;border-radius:var(--r);margin-bottom:16px;font-size:13px}
+.alert-warn{background:var(--yellow-light);border:1px solid #FDE68A;color:var(--yellow)}
+.alert-info{background:var(--blue-light);border:1px solid #BFDBFE;color:var(--blue)}
+.alert-success{background:var(--green-light);border:1px solid #BBF7D0;color:var(--green)}
+
+/* ───── ANIMATION HELPERS ───── */
+.fade-in{animation:fadeIn .4s ease}
+.scale-in{animation:scaleIn .3s ease}
+@keyframes scaleIn{from{opacity:0;transform:scale(.96)}to{opacity:1;transform:scale(1)}}
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- ═══════════ SIDEBAR ═══════════ -->
+<aside class="sidebar">
+  <div class="logo">
+    <div class="logo-wrap">
+      <div class="logo-badge">🛡️</div>
+      <div>
+        <div class="logo-name">GigShield</div>
+        <div class="logo-tag">AI · Income Protection</div>
+      </div>
+    </div>
+    <div class="logo-badge2">● DEVTrails 2026</div>
+  </div>
+
+  <nav class="nav">
+    <div class="nav-group">
+      <div class="nav-label">Platform</div>
+      <div class="nav-item active" onclick="showPanel('overview')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+        Dashboard
+      </div>
+      <div class="nav-item" onclick="showPanel('demo')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        Live Demo
+        <span class="nav-pip orange">LIVE</span>
+      </div>
+    </div>
+    <div class="nav-group">
+      <div class="nav-label">Worker Portal</div>
+      <div class="nav-item" onclick="showPanel('onboarding')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
+        Onboarding
+      </div>
+      <div class="nav-item" onclick="showPanel('worker')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        My Policy
+      </div>
+      <div class="nav-item" onclick="showPanel('claims')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        My Claims
+      </div>
+      <div class="nav-item" onclick="showPanel('ai')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+        AI Assistant
+        <span class="nav-pip" style="background:var(--purple)">AI</span>
+      </div>
+    </div>
+    <div class="nav-group">
+      <div class="nav-label">Insurer Admin</div>
+      <div class="nav-item" onclick="showPanel('insurer')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        Loss Analytics
+      </div>
+      <div class="nav-item" onclick="showPanel('fraud')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        Fraud Intelligence
+        <span class="nav-pip">2</span>
+      </div>
+      <div class="nav-item" onclick="showPanel('marketcrash')" style="border:1px solid #FECACA;background:#FEF2F2">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#DC2626" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        <span style="color:#DC2626;font-weight:700">Market Crash</span>
+        <span class="nav-pip" style="background:#DC2626;animation:pulse 1.5s infinite">🚨</span>
+      </div>
+    </div>
+  </nav>
+
+  <div class="sidebar-foot">
+    <div class="live-bar">
+      <div class="live-dot"></div>
+      <div class="live-text">System Monitoring Active</div>
+    </div>
+  </div>
+</aside>
+
+<!-- ═══════════ MAIN ═══════════ -->
+<main class="main">
+  <div class="topbar">
+    <div>
+      <div class="pg-title" id="pg-title">Platform Dashboard</div>
+      <div class="breadcrumb">GigShield AI · Guidewire DEVTrails 2026</div>
+    </div>
+    <div class="topbar-right">
+      <div class="badge badge-green">● All Systems Healthy</div>
+      <button class="btn btn-primary" onclick="showPanel('demo')">⚡ Run Live Demo</button>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- ════════ DASHBOARD ════════ -->
+    <div id="panel-overview" class="panel active">
+      <div class="stat-grid">
+        <div class="stat-card">
+          <div class="stat-stripe" style="background:var(--brand)"></div>
+          <div class="stat-icon" style="background:var(--brand-light)">👷</div>
+          <div class="stat-label">Active Workers</div>
+          <div class="stat-value" id="m-workers">7,392</div>
+          <div class="stat-change up">↑ 234 this week</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-stripe" style="background:var(--blue)"></div>
+          <div class="stat-icon" style="background:var(--blue-light)">📋</div>
+          <div class="stat-label">Active Policies</div>
+          <div class="stat-value">6,841</div>
+          <div class="stat-change up">Renewed every Monday</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-stripe" style="background:var(--green)"></div>
+          <div class="stat-icon" style="background:var(--green-light)">💸</div>
+          <div class="stat-label">Claims Paid</div>
+          <div class="stat-value">₹5.6L</div>
+          <div class="stat-change up">↑ 1,247 claims processed</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-stripe" style="background:var(--yellow)"></div>
+          <div class="stat-icon" style="background:var(--yellow-light)">⏱️</div>
+          <div class="stat-label">Avg Payout Time</div>
+          <div class="stat-value">112 min</div>
+          <div class="stat-change up">Target &lt;120 min ✓</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-stripe" style="background:var(--green)"></div>
+          <div class="stat-icon" style="background:var(--green-light)">📊</div>
+          <div class="stat-label">Loss Ratio</div>
+          <div class="stat-value" style="color:var(--green)">58.3%</div>
+          <div class="stat-change up">Healthy (&lt;65% target)</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-stripe" style="background:var(--red)"></div>
+          <div class="stat-icon" style="background:var(--red-light)">🚨</div>
+          <div class="stat-label">Fraud Prevented</div>
+          <div class="stat-value" style="color:var(--red)">₹2.48L</div>
+          <div class="stat-change dn">12 rings blocked</div>
+        </div>
+      </div>
+
+      <div class="grid-2" style="margin-bottom:18px">
+        <div class="card">
+          <div class="sec-head">
+            <div><div class="sec-title">Weekly Claims Volume</div><div class="sec-sub">Last 8 weeks · Auto-processed</div></div>
+          </div>
+          <div class="chart-wrap"><canvas id="chart-claims"></canvas></div>
+        </div>
+        <div class="card">
+          <div class="sec-head">
+            <div><div class="sec-title">Zone Risk Heatmap</div><div class="sec-sub">Loss ratio % by zone</div></div>
+          </div>
+          <div class="chart-wrap"><canvas id="chart-zones"></canvas></div>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="sec-head"><div class="sec-title">🔴 Live Disruptions</div></div>
+          <div class="feed-item">
+            <div class="feed-dot" style="background:var(--red)"></div>
+            <div>
+              <div class="feed-text"><strong>Red Alert Rainfall</strong> — Velachery, Chennai</div>
+              <div class="feed-time">78.4mm/3hr · IMD confirmed · 847 policies auto-triggered</div>
+            </div>
+          </div>
+          <div class="feed-item">
+            <div class="feed-dot" style="background:var(--yellow)"></div>
+            <div>
+              <div class="feed-text"><strong>Severe AQI 312</strong> — Hauz Khas, Delhi</div>
+              <div class="feed-time">CPCB severe category · 891 policies · Claims initiated</div>
+            </div>
+          </div>
+          <div class="feed-item" style="border:none">
+            <div class="feed-dot" style="background:var(--green)"></div>
+            <div>
+              <div class="feed-text"><strong>All other zones normal</strong></div>
+              <div class="feed-time">IMD/CPCB APIs polling every 15 min</div>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="sec-head"><div class="sec-title">WIIS Score Distribution</div><div class="sec-sub">Worker trust tier breakdown</div></div>
+          <div class="chart-wrap"><canvas id="chart-wiis"></canvas></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════ LIVE DEMO ════════ -->
+    <div id="panel-demo" class="panel">
+      <div class="alert alert-info">
+        <span style="font-size:18px">ℹ️</span>
+        <div><strong>How this works:</strong> GigShield's parametric triggers pull from IMD & CPCB government APIs — not GPS. Click any disruption below to watch the full AI pipeline fire in real-time, including 7-signal fraud detection and UPI payout processing.</div>
+      </div>
+
+      <!-- Worker Identity Card -->
+      <div class="card card-highlight" style="margin-bottom:18px">
+        <div style="display:flex;gap:16px;align-items:center;flex-wrap:wrap">
+          <div style="width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,var(--brand),var(--brand2));display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;box-shadow:0 4px 14px rgba(255,107,53,.35)">👨‍🦱</div>
+          <div style="flex:1;min-width:160px">
+            <div style="font-family:var(--font-display);font-size:17px;font-weight:800;color:var(--gray900)">Rajan Kumar</div>
+            <div style="font-size:12px;color:var(--gray500);margin-top:2px">Swiggy Delivery Partner · Velachery, Chennai · 18 months tenure</div>
+            <div style="display:flex;gap:6px;margin-top:6px;flex-wrap:wrap">
+              <span class="badge badge-orange">Food Delivery</span>
+              <span class="badge badge-blue">High-Risk Zone</span>
+              <span class="badge badge-green">Policy Active</span>
+            </div>
+          </div>
+          <div style="text-align:right;min-width:120px">
+            <div style="font-size:11px;color:var(--gray400);font-weight:600;text-transform:uppercase;letter-spacing:.05em">This week's coverage</div>
+            <div style="font-family:var(--font-display);font-size:30px;font-weight:800;color:var(--green)">₹1,600</div>
+            <div style="font-size:11px;color:var(--gray400)">Premium paid: ₹65/week</div>
+          </div>
+          <div style="background:var(--gray50);border:1px solid var(--gray200);border-radius:var(--r2);padding:14px 20px;text-align:center;min-width:100px">
+            <div style="font-size:10px;color:var(--gray400);font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px">WIIS Score</div>
+            <div style="font-family:var(--font-display);font-size:28px;font-weight:800;color:var(--brand)">74</div>
+            <span class="badge badge-gray">Silver Tier</span>
+          </div>
+        </div>
+        <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--gray200)">
+          <div style="font-size:11px;font-weight:700;color:var(--gray500);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Premium breakdown (XGBoost calculated)</div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <div style="background:var(--gray50);border:1px solid var(--gray200);border-radius:8px;padding:6px 11px;font-size:11px;font-weight:500">Base rate <strong>₹30</strong></div>
+            <div style="background:var(--yellow-light);border:1px solid #FDE68A;border-radius:8px;padding:6px 11px;font-size:11px;font-weight:500">Zone risk 2.1× <strong style="color:var(--yellow)">+₹20</strong></div>
+            <div style="background:var(--yellow-light);border:1px solid #FDE68A;border-radius:8px;padding:6px 11px;font-size:11px;font-weight:500">Weather forecast <strong style="color:var(--yellow)">+₹15</strong></div>
+            <div style="background:var(--green-light);border:1px solid #BBF7D0;border-radius:8px;padding:6px 11px;font-size:11px;font-weight:500">WIIS discount <strong style="color:var(--green)">-₹0</strong></div>
+            <div style="background:linear-gradient(135deg,var(--brand),var(--brand2));border-radius:8px;padding:6px 11px;font-size:11px;font-weight:700;color:#fff">Total ₹65/week</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Trigger Buttons -->
+      <div class="grid-3" style="margin-bottom:18px">
+        <button class="trigger-btn trigger-rain" onclick="triggerDemo('rain')">
+          <span class="tb-icon">🌧️</span>
+          Simulate Red Alert Rain
+          <span class="tb-label">Velachery, Chennai · 78.4mm/3hr · IMD Red Alert</span>
+        </button>
+        <button class="trigger-btn trigger-aqi" onclick="triggerDemo('aqi')">
+          <span class="tb-icon">🌫️</span>
+          Simulate Severe AQI
+          <span class="tb-label">Hauz Khas, Delhi · AQI 312 · CPCB Severe</span>
+        </button>
+        <button class="trigger-btn trigger-heat" onclick="triggerDemo('heat')">
+          <span class="tb-icon">🌡️</span>
+          Simulate Heat Wave
+          <span class="tb-label">Banjara Hills, Hyd · 45.2°C · IMD Advisory</span>
+        </button>
+      </div>
+
+      <!-- Pipeline card -->
+      <div class="card" style="margin-bottom:18px">
+        <div class="sec-head">
+          <div class="sec-title">⚡ AutoPay Pipeline — Real-Time</div>
+          <span class="badge badge-gray" id="pipeline-status">Idle — waiting for trigger</span>
+        </div>
+        <div id="pipeline-feed" style="min-height:90px">
+          <div style="color:var(--gray400);font-size:13px;padding:24px 0;text-align:center;border:2px dashed var(--gray200);border-radius:var(--r);margin-top:8px">
+            👆 Click any disruption trigger above to start the live demo
+          </div>
+        </div>
+      </div>
+
+      <!-- Results -->
+      <div id="demo-results" style="display:none">
+        <div class="stat-grid" id="demo-metrics" style="margin-bottom:18px"></div>
+        <div class="grid-2">
+          <div class="card">
+            <div class="sec-title" style="margin-bottom:14px">🤖 7-Signal Fraud Detection Results</div>
+            <div id="fraud-breakdown"></div>
+          </div>
+          <div class="card">
+            <div class="sec-title" style="margin-bottom:14px">📱 Rajan's UPI Notification</div>
+            <div style="background:var(--gray50);border:1px solid var(--gray200);border-radius:var(--r2);padding:16px" id="rajan-notification">
+              <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid var(--gray200)">
+                <div style="width:36px;height:36px;background:linear-gradient(135deg,var(--brand),var(--brand2));border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px">🛡️</div>
+                <div><div style="font-size:13px;font-weight:700;color:var(--gray900)">GigShield AI</div><div style="font-size:11px;color:var(--gray400)">Just now</div></div>
+                <span class="badge badge-green" style="margin-left:auto">Delivered</span>
+              </div>
+              <div style="font-size:13px;line-height:1.7;color:var(--gray700)" id="rajan-msg">Processing...</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════ ONBOARDING ════════ -->
+    <div id="panel-onboarding" class="panel">
+      <div style="max-width:600px">
+        <div style="font-family:var(--font-display);font-size:22px;font-weight:800;margin-bottom:4px">Get Income Protection in 2 Minutes</div>
+        <div style="color:var(--gray500);font-size:13px;margin-bottom:24px">Join 7,392 delivery partners already protected by GigShield AI</div>
+
+        <div class="steps">
+          <div class="step done"><div class="step-num">✓</div><div class="step-text">Identity</div></div>
+          <div class="step active"><div class="step-num">2</div><div class="step-text">Platform</div></div>
+          <div class="step"><div class="step-num">3</div><div class="step-text">Coverage</div></div>
+          <div class="step"><div class="step-num">4</div><div class="step-text">UPI Setup</div></div>
+        </div>
+
+        <div class="card" style="margin-bottom:16px">
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Full Name</label>
+              <input class="form-input" id="f-name" placeholder="Enter your name" value="Rajan Kumar"/>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Mobile Number</label>
+              <input class="form-input" id="f-phone" placeholder="+91 XXXXX XXXXX" value="+91 98765 43210"/>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Delivery Platform</label>
+              <select class="form-input" id="f-platform">
+                <option value="swiggy">🍔 Swiggy</option>
+                <option value="zomato">🍕 Zomato</option>
+                <option value="zepto">⚡ Zepto</option>
+                <option value="blinkit">🟡 Blinkit</option>
+                <option value="amazon">📦 Amazon Flex</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Delivery Zone</label>
+              <select class="form-input" id="f-zone" onchange="recalcPremium()">
+                <option value="velachery">Velachery, Chennai — High Risk</option>
+                <option value="koramangala">Koramangala, Bengaluru — Medium</option>
+                <option value="andheri">Andheri West, Mumbai — High Risk</option>
+                <option value="hauz-khas">Hauz Khas, Delhi — Medium</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Average Daily Income (₹)</label>
+              <input class="form-input" id="f-income" type="number" value="800" min="200" max="3000" oninput="recalcPremium()"/>
+              <div class="form-hint">Your last 30-day average from platform</div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">UPI ID for Payouts</label>
+              <input class="form-input" id="f-upi" placeholder="yourname@bank" value="rajan@oksbi"/>
+              <div class="form-hint">Payouts arrive within 2 hours of disruption</div>
+            </div>
+          </div>
+
+          <!-- AI Premium Preview -->
+          <div style="background:linear-gradient(135deg,#FFF5F0,#FFFAF9);border:1.5px solid var(--brand-mid);border-radius:var(--r2);padding:18px;margin-top:8px">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+              <div style="font-size:11px;font-weight:700;color:var(--brand);text-transform:uppercase;letter-spacing:.07em">🤖 AI-Calculated Weekly Premium</div>
+              <span class="badge badge-orange">XGBoost Model</span>
+            </div>
+            <div style="display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:10px">
+              <div>
+                <div style="font-family:var(--font-display);font-size:38px;font-weight:800;color:var(--brand);line-height:1" id="calc-premium">₹65</div>
+                <div style="font-size:12px;color:var(--gray500);margin-top:3px">per week · auto-deducted Sundays</div>
+              </div>
+              <div style="text-align:right">
+                <div style="font-size:11px;color:var(--gray500)">Coverage if disruption triggers</div>
+                <div style="font-family:var(--font-display);font-size:22px;font-weight:800;color:var(--green)" id="calc-coverage">₹1,600</div>
+              </div>
+            </div>
+            <div style="margin-top:12px;display:flex;gap:6px;flex-wrap:wrap" id="premium-chips">
+              <span style="background:var(--white);border:1px solid var(--gray200);border-radius:6px;padding:4px 10px;font-size:11px">Base ₹30</span>
+              <span style="background:var(--yellow-light);border:1px solid #FDE68A;border-radius:6px;padding:4px 10px;font-size:11px;color:var(--yellow)">Zone 2.1× +₹20</span>
+              <span style="background:var(--yellow-light);border:1px solid #FDE68A;border-radius:6px;padding:4px 10px;font-size:11px;color:var(--yellow)">Weather +₹15</span>
+              <span style="background:var(--green-light);border:1px solid #BBF7D0;border-radius:6px;padding:4px 10px;font-size:11px;color:var(--green)">WIIS -₹0</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card" style="margin-bottom:16px">
+          <div style="font-size:13px;font-weight:700;color:var(--gray800);margin-bottom:12px">✅ What's covered in your zone this week</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+            <div style="display:flex;align-items:center;gap:8px;padding:10px;background:var(--green-light);border-radius:var(--r);border:1px solid #BBF7D0">
+              <span style="font-size:18px">🌧️</span>
+              <div><div style="font-size:11px;font-weight:700;color:var(--green)">Extreme Rainfall</div><div style="font-size:10px;color:var(--gray500)">≥64mm/3hr Red Alert</div></div>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;padding:10px;background:var(--green-light);border-radius:var(--r);border:1px solid #BBF7D0">
+              <span style="font-size:18px">🌫️</span>
+              <div><div style="font-size:11px;font-weight:700;color:var(--green)">Severe AQI</div><div style="font-size:10px;color:var(--gray500)">AQI ≥300 Severe</div></div>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;padding:10px;background:var(--green-light);border-radius:var(--r);border:1px solid #BBF7D0">
+              <span style="font-size:18px">📵</span>
+              <div><div style="font-size:11px;font-weight:700;color:var(--green)">Platform Outage</div><div style="font-size:10px;color:var(--gray500)">&gt;30 min downtime</div></div>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;padding:10px;background:var(--green-light);border-radius:var(--r);border:1px solid #BBF7D0">
+              <span style="font-size:18px">🚧</span>
+              <div><div style="font-size:11px;font-weight:700;color:var(--green)">Curfew / Bandh</div><div style="font-size:10px;color:var(--gray500)">Section 144 detected</div></div>
+            </div>
+          </div>
+          <div style="margin-top:10px;padding:10px;background:var(--red-light);border-radius:var(--r);border:1px solid #FECACA;font-size:11px;color:var(--red)">
+            ❌ Not covered: Health, accidents, vehicle repair, or personal income reduction
+          </div>
+        </div>
+
+        <button class="btn btn-primary btn-lg" style="width:100%" onclick="completeOnboarding()">
+          🛡️ Activate My GigShield Policy — ₹65/week
+        </button>
+        <div style="text-align:center;margin-top:10px;font-size:11px;color:var(--gray400)">Auto-pay mandate via Razorpay · Cancel anytime · First week free trial</div>
+      </div>
+    </div>
+
+    <!-- ════════ WORKER PROFILE ════════ -->
+    <div id="panel-worker" class="panel">
+      <div class="hero-banner">
+        <div class="hero-premium-chip">🛡️ Policy Active — Week 18</div>
+        <div class="hero-title">Namaste, Rajan! You're protected.</div>
+        <div class="hero-sub">Your income is safeguarded against disruptions in Velachery, Chennai this week.</div>
+        <div class="hero-stats">
+          <div class="hs"><div class="hs-n">₹1,600</div><div class="hs-l">Coverage this week</div></div>
+          <div style="width:1px;background:var(--brand-mid)"></div>
+          <div class="hs"><div class="hs-n">₹65</div><div class="hs-l">Weekly premium</div></div>
+          <div style="width:1px;background:var(--brand-mid)"></div>
+          <div class="hs"><div class="hs-n">3</div><div class="hs-l">Claims paid</div></div>
+          <div style="width:1px;background:var(--brand-mid)"></div>
+          <div class="hs"><div class="hs-n">₹3,200</div><div class="hs-l">Total received</div></div>
+        </div>
+      </div>
+
+      <div class="grid-2" style="margin-bottom:18px">
+        <!-- Policy Card -->
+        <div class="policy-card">
+          <div class="policy-week">Active Policy · Week of 17–23 Mar 2026</div>
+          <div class="policy-amount">₹1,600</div>
+          <div class="policy-sub">Maximum income coverage this week</div>
+          <div style="margin-top:20px;display:flex;gap:10px">
+            <div style="flex:1;background:rgba(255,255,255,.15);border-radius:8px;padding:10px">
+              <div style="font-size:9px;opacity:.75;text-transform:uppercase;letter-spacing:.07em">Premium Paid</div>
+              <div style="font-size:16px;font-weight:800;margin-top:2px">₹65</div>
+            </div>
+            <div style="flex:1;background:rgba(255,255,255,.15);border-radius:8px;padding:10px">
+              <div style="font-size:9px;opacity:.75;text-transform:uppercase;letter-spacing:.07em">Triggers Active</div>
+              <div style="font-size:16px;font-weight:800;margin-top:2px">5</div>
+            </div>
+            <div style="flex:1;background:rgba(255,255,255,.15);border-radius:8px;padding:10px">
+              <div style="font-size:9px;opacity:.75;text-transform:uppercase;letter-spacing:.07em">UPI Status</div>
+              <div style="font-size:16px;font-weight:800;margin-top:2px">✓ Live</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- WIIS Score -->
+        <div class="card">
+          <div class="sec-head">
+            <div><div class="sec-title">WIIS Score</div><div class="sec-sub">Worker Income Intelligence Score · Portable across platforms</div></div>
+          </div>
+          <div class="wiis-ring">
+            <svg width="130" height="130" viewBox="0 0 130 130">
+              <circle cx="65" cy="65" r="55" fill="none" stroke="#F3F4F6" stroke-width="12"/>
+              <circle cx="65" cy="65" r="55" fill="none" stroke="url(#wiisGrad)" stroke-width="12" stroke-dasharray="345.6" stroke-dashoffset="93.3" stroke-linecap="round"/>
+              <defs><linearGradient id="wiisGrad" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#FF6B35"/><stop offset="100%" stop-color="#E85D04"/></linearGradient></defs>
+            </svg>
+            <div class="wiis-center">
+              <div class="wiis-num">74</div>
+              <div class="wiis-lbl">Silver Tier</div>
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:14px">
+            <div style="background:var(--gray50);border-radius:8px;padding:8px 11px;font-size:11px"><span style="color:var(--gray400)">Platform tenure</span><br/><strong>18/24 months</strong></div>
+            <div style="background:var(--gray50);border-radius:8px;padding:8px 11px;font-size:11px"><span style="color:var(--gray400)">Activity score</span><br/><strong>21/22 days</strong></div>
+            <div style="background:var(--gray50);border-radius:8px;padding:8px 11px;font-size:11px"><span style="color:var(--gray400)">Claim legitimacy</span><br/><strong>100% clean</strong></div>
+            <div style="background:var(--gray50);border-radius:8px;padding:8px 11px;font-size:11px"><span style="color:var(--gray400)">To Gold tier</span><br/><strong>6 pts needed</strong></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Live Weather / Risk Monitor -->
+      <div class="card">
+        <div class="sec-head">
+          <div class="sec-title">📡 Live Risk Monitor — Velachery, Chennai</div>
+          <span class="badge badge-orange">🔴 High Alert</span>
+        </div>
+        <div class="grid-4" id="risk-tiles">
+          <div style="text-align:center;padding:14px;background:var(--red-light);border-radius:var(--r);border:1px solid #FECACA">
+            <div style="font-size:24px;margin-bottom:4px">🌧️</div>
+            <div style="font-size:10px;font-weight:700;color:var(--red);text-transform:uppercase">Rainfall</div>
+            <div style="font-size:20px;font-weight:800;color:var(--red);margin-top:2px">78.4mm</div>
+            <div style="font-size:9px;color:var(--gray400)">RED ALERT · Triggered</div>
+          </div>
+          <div style="text-align:center;padding:14px;background:var(--green-light);border-radius:var(--r);border:1px solid #BBF7D0">
+            <div style="font-size:24px;margin-bottom:4px">🌬️</div>
+            <div style="font-size:10px;font-weight:700;color:var(--green);text-transform:uppercase">AQI</div>
+            <div style="font-size:20px;font-weight:800;color:var(--green);margin-top:2px">68</div>
+            <div style="font-size:9px;color:var(--gray400)">GOOD · No trigger</div>
+          </div>
+          <div style="text-align:center;padding:14px;background:var(--green-light);border-radius:var(--r);border:1px solid #BBF7D0">
+            <div style="font-size:24px;margin-bottom:4px">🌡️</div>
+            <div style="font-size:10px;font-weight:700;color:var(--green);text-transform:uppercase">Temperature</div>
+            <div style="font-size:20px;font-weight:800;color:var(--green);margin-top:2px">28°C</div>
+            <div style="font-size:9px;color:var(--gray400)">NORMAL · No trigger</div>
+          </div>
+          <div style="text-align:center;padding:14px;background:var(--green-light);border-radius:var(--r);border:1px solid #BBF7D0">
+            <div style="font-size:24px;margin-bottom:4px">📱</div>
+            <div style="font-size:10px;font-weight:700;color:var(--green);text-transform:uppercase">Platform</div>
+            <div style="font-size:20px;font-weight:800;color:var(--green);margin-top:2px">Online</div>
+            <div style="font-size:9px;color:var(--gray400)">Swiggy · No outage</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════ CLAIMS ════════ -->
+    <div id="panel-claims" class="panel">
+      <div class="alert alert-success">
+        <span>✅</span>
+        <div>Your last claim of <strong>₹1,200</strong> was auto-approved in 94 minutes. No manual filing was needed — GigShield detected the Red Alert rainfall automatically.</div>
+      </div>
+      <div class="card">
+        <div class="sec-head">
+          <div class="sec-title">Claims History — Rajan Kumar</div>
+          <span class="badge badge-green">3 paid · ₹3,200 total</span>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Date</th><th>Trigger</th><th>Coverage</th><th>Payout</th><th>Fraud Score</th><th>Status</th><th>Payout Time</th></tr></thead>
+            <tbody>
+              <tr>
+                <td style="font-weight:600">Mar 15, 2026</td>
+                <td><span class="badge badge-blue">🌧️ Red Alert Rain</span></td>
+                <td>₹1,600</td>
+                <td style="font-weight:700;color:var(--green)">₹1,200</td>
+                <td><div style="display:flex;align-items:center;gap:6px"><div style="flex:1;height:5px;background:var(--gray100);border-radius:3px"><div style="width:87%;height:100%;background:var(--green);border-radius:3px"></div></div><span style="font-size:11px;font-weight:700;color:var(--green)">87/100</span></div></td>
+                <td><span class="badge badge-green">Auto-Approved</span></td>
+                <td style="font-size:12px;color:var(--gray500)">94 min</td>
+              </tr>
+              <tr>
+                <td style="font-weight:600">Feb 28, 2026</td>
+                <td><span class="badge badge-purple">🌫️ Severe AQI 318</span></td>
+                <td>₹1,600</td>
+                <td style="font-weight:700;color:var(--green)">₹1,000</td>
+                <td><div style="display:flex;align-items:center;gap:6px"><div style="flex:1;height:5px;background:var(--gray100);border-radius:3px"><div style="width:82%;height:100%;background:var(--green);border-radius:3px"></div></div><span style="font-size:11px;font-weight:700;color:var(--green)">82/100</span></div></td>
+                <td><span class="badge badge-green">Auto-Approved</span></td>
+                <td style="font-size:12px;color:var(--gray500)">108 min</td>
+              </tr>
+              <tr>
+                <td style="font-weight:600">Jan 12, 2026</td>
+                <td><span class="badge badge-blue">🌧️ Cyclone Rain</span></td>
+                <td>₹1,600</td>
+                <td style="font-weight:700;color:var(--green)">₹1,000</td>
+                <td><div style="display:flex;align-items:center;gap:6px"><div style="flex:1;height:5px;background:var(--gray100);border-radius:3px"><div style="width:79%;height:100%;background:var(--green);border-radius:3px"></div></div><span style="font-size:11px;font-weight:700;color:var(--green)">79/100</span></div></td>
+                <td><span class="badge badge-green">Auto-Approved</span></td>
+                <td style="font-size:12px;color:var(--gray500)">127 min</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:16px">
+        <div class="sec-title" style="margin-bottom:14px">🤖 Why Your Claims Were Approved — AI Explainability</div>
+        <div class="progress-row"><div class="progress-label">GPS zone match</div><div class="progress-track"><div class="progress-fill" style="width:87%;background:var(--green)"></div></div><div class="progress-val">13/15</div></div>
+        <div class="progress-row"><div class="progress-label">Cell tower pattern</div><div class="progress-track"><div class="progress-fill" style="width:85%;background:var(--green)"></div></div><div class="progress-val">17/20</div></div>
+        <div class="progress-row"><div class="progress-label">Accelerometer</div><div class="progress-track"><div class="progress-fill" style="width:80%;background:var(--green)"></div></div><div class="progress-val">16/20</div></div>
+        <div class="progress-row"><div class="progress-label">Platform order logs</div><div class="progress-track"><div class="progress-fill" style="width:80%;background:var(--green)"></div></div><div class="progress-val">12/15</div></div>
+        <div class="progress-row"><div class="progress-label">Cluster anomaly</div><div class="progress-track"><div class="progress-fill" style="width:93%;background:var(--green)"></div></div><div class="progress-val">14/15</div></div>
+        <div class="progress-row"><div class="progress-label">Claim frequency</div><div class="progress-track"><div class="progress-fill" style="width:80%;background:var(--green)"></div></div><div class="progress-val">8/10</div></div>
+        <div class="progress-row"><div class="progress-label">IP geolocation</div><div class="progress-track"><div class="progress-fill" style="width:80%;background:var(--green)"></div></div><div class="progress-val">4/5</div></div>
+        <div style="margin-top:12px;padding:12px 16px;background:var(--green-light);border-radius:var(--r);border:1px solid #BBF7D0;display:flex;justify-content:space-between;align-items:center">
+          <span style="font-size:13px;color:var(--green);font-weight:600">Composite Fraud Score</span>
+          <span style="font-family:var(--font-display);font-size:22px;font-weight:800;color:var(--green)">84/100 — Auto-Approved ✓</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════ AI ASSISTANT ════════ -->
+    <div id="panel-ai" class="panel">
+      <div class="grid-2" style="align-items:start">
+        <div class="card" style="height:fit-content">
+          <div class="sec-head">
+            <div>
+              <div class="sec-title">🤖 GigShield AI Assistant</div>
+              <div class="sec-sub">Powered by Claude · Real-time insurance guidance</div>
+            </div>
+            <span class="badge badge-purple">Claude AI</span>
+          </div>
+
+          <div class="chat-box" id="chat-box">
+            <div class="msg msg-ai">
+              👋 <strong>Hi! I'm GigShield's AI assistant.</strong><br/><br/>
+              I can help you understand your policy, explain your premium calculation, check your WIIS score, or answer any questions about your income protection coverage.<br/><br/>
+              What would you like to know?
+            </div>
+          </div>
+
+          <div class="chat-input-row">
+            <input class="chat-input" id="chat-input" placeholder="Ask about your premium, claims, WIIS score..." onkeydown="if(event.key==='Enter')sendChat()"/>
+            <button class="btn btn-primary" onclick="sendChat()">Send →</button>
+          </div>
+
+          <div style="margin-top:12px">
+            <div style="font-size:11px;color:var(--gray400);font-weight:600;margin-bottom:8px">QUICK QUESTIONS</div>
+            <div style="display:flex;flex-wrap:wrap;gap:6px">
+              <button class="btn btn-ghost" style="font-size:11px;padding:5px 10px" onclick="quickChat('Why is my premium ₹65 this week?')">Why ₹65 premium?</button>
+              <button class="btn btn-ghost" style="font-size:11px;padding:5px 10px" onclick="quickChat('How do I increase my WIIS score to Gold tier?')">Reach Gold tier?</button>
+              <button class="btn btn-ghost" style="font-size:11px;padding:5px 10px" onclick="quickChat('What disruptions are covered for me this week?')">What\'s covered?</button>
+              <button class="btn btn-ghost" style="font-size:11px;padding:5px 10px" onclick="quickChat('How does GigShield detect fraud?')">How is fraud caught?</button>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <div class="card" style="margin-bottom:16px">
+            <div class="sec-title" style="margin-bottom:14px">📊 Your Policy Summary</div>
+            <div style="display:flex;flex-direction:column;gap:10px">
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 13px;background:var(--gray50);border-radius:var(--r);border:1px solid var(--gray200)">
+                <span style="font-size:12px;color:var(--gray600);font-weight:500">Weekly premium</span>
+                <span style="font-weight:700;color:var(--brand)">₹65</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 13px;background:var(--gray50);border-radius:var(--r);border:1px solid var(--gray200)">
+                <span style="font-size:12px;color:var(--gray600);font-weight:500">Max coverage this week</span>
+                <span style="font-weight:700;color:var(--green)">₹1,600</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 13px;background:var(--gray50);border-radius:var(--r);border:1px solid var(--gray200)">
+                <span style="font-size:12px;color:var(--gray600);font-weight:500">Zone risk multiplier</span>
+                <span style="font-weight:700;color:var(--yellow)">2.1× (High)</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 13px;background:var(--gray50);border-radius:var(--r);border:1px solid var(--gray200)">
+                <span style="font-size:12px;color:var(--gray600);font-weight:500">WIIS score / tier</span>
+                <span style="font-weight:700;color:var(--brand)">74 / Silver</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 13px;background:var(--gray50);border-radius:var(--r);border:1px solid var(--gray200)">
+                <span style="font-size:12px;color:var(--gray600);font-weight:500">Active triggers</span>
+                <span style="font-weight:700">5 parametric</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 13px;background:var(--green-light);border-radius:var(--r);border:1px solid #BBF7D0">
+                <span style="font-size:12px;color:var(--green);font-weight:600">Total paid to you</span>
+                <span style="font-weight:800;color:var(--green);font-size:16px">₹3,200</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="sec-title" style="margin-bottom:4px">🥇 Upgrade to Gold Tier</div>
+            <div class="sec-sub" style="margin-bottom:14px">Unlock ₹15/week discount + instant claim approval</div>
+            <div style="background:linear-gradient(135deg,#FEF3C7,#FFFBEB);border:1.5px solid #F59E0B;border-radius:var(--r2);padding:16px">
+              <div style="font-size:12px;color:var(--yellow);font-weight:700;margin-bottom:10px">You need 6 more points (74 → 80)</div>
+              <div style="display:flex;flex-direction:column;gap:6px">
+                <div style="font-size:12px;color:var(--gray700)">✓ Work 1 more active month <strong style="color:var(--gray900)">(+3 pts)</strong></div>
+                <div style="font-size:12px;color:var(--gray700)">✓ Maintain 22+ active days this month <strong style="color:var(--gray900)">(+2 pts)</strong></div>
+                <div style="font-size:12px;color:var(--gray700)">✓ Zero fraudulent claims <strong style="color:var(--gray900)">(+1 pt)</strong></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════ INSURER ADMIN ════════ -->
+    <div id="panel-insurer" class="panel">
+      <div class="stat-grid">
+        <div class="stat-card">
+          <div class="stat-stripe" style="background:var(--green)"></div>
+          <div class="stat-icon" style="background:var(--green-light)">📊</div>
+          <div class="stat-label">Overall Loss Ratio</div>
+          <div class="stat-value" style="color:var(--green)">58.3%</div>
+          <div class="stat-change up">Target &lt;65% ✓</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-stripe" style="background:var(--brand)"></div>
+          <div class="stat-icon" style="background:var(--brand-light)">💰</div>
+          <div class="stat-label">Gross Written Premium</div>
+          <div class="stat-value">₹24.8L</div>
+          <div class="stat-change up">↑ 12% vs last month</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-stripe" style="background:var(--red)"></div>
+          <div class="stat-icon" style="background:var(--red-light)">💸</div>
+          <div class="stat-label">Claims Incurred</div>
+          <div class="stat-value">₹14.5L</div>
+          <div class="stat-change dn">1,247 claims this month</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-stripe" style="background:var(--blue)"></div>
+          <div class="stat-icon" style="background:var(--blue-light)">🔮</div>
+          <div class="stat-label">Next Week Forecast</div>
+          <div class="stat-value" style="color:var(--yellow)">62.1%</div>
+          <div class="stat-change dn">↑ Monsoon season risk</div>
+        </div>
+      </div>
+
+      <div class="grid-2" style="margin-bottom:18px">
+        <div class="card">
+          <div class="sec-head">
+            <div class="sec-title">Zone Loss Ratio Breakdown</div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Zone</th><th>Workers</th><th>Premium</th><th>Claims</th><th>Loss Ratio</th><th>Action</th></tr></thead>
+              <tbody>
+                <tr>
+                  <td style="font-weight:600">Velachery, Chennai</td><td>1,842</td><td>₹6.2L</td><td>₹4.9L</td>
+                  <td><span class="badge badge-red">79.0% ⚠️</span></td>
+                  <td><button class="btn btn-danger" style="font-size:10px;padding:4px 9px">Raise premium</button></td>
+                </tr>
+                <tr>
+                  <td style="font-weight:600">Koramangala, BLR</td><td>2,103</td><td>₹5.8L</td><td>₹3.2L</td>
+                  <td><span class="badge badge-green">55.2% ✓</span></td>
+                  <td><button class="btn btn-success" style="font-size:10px;padding:4px 9px">Offer discount</button></td>
+                </tr>
+                <tr>
+                  <td style="font-weight:600">Andheri West, MUM</td><td>1,621</td><td>₹4.9L</td><td>₹3.2L</td>
+                  <td><span class="badge badge-yellow">65.3% —</span></td>
+                  <td><button class="btn btn-ghost" style="font-size:10px;padding:4px 9px">Monitor</button></td>
+                </tr>
+                <tr>
+                  <td style="font-weight:600">Hauz Khas, Delhi</td><td>1,826</td><td>₹5.1L</td><td>₹2.8L</td>
+                  <td><span class="badge badge-green">54.9% ✓</span></td>
+                  <td><button class="btn btn-success" style="font-size:10px;padding:4px 9px">Offer discount</button></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="card">
+          <div class="sec-head"><div class="sec-title">Loss Ratio Trend</div><div class="sec-sub">Last 8 weeks with AI forecast</div></div>
+          <div class="chart-wrap"><canvas id="chart-loss"></canvas></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="sec-head">
+          <div>
+            <div class="sec-title">🔮 AI Reserve Alert — Next Week Prediction</div>
+            <div class="sec-sub">Prophet model · Northeast monsoon season detected</div>
+          </div>
+          <span class="badge badge-yellow">Action Required</span>
+        </div>
+        <div class="alert alert-warn">
+          <span style="font-size:18px">⚠️</span>
+          <div><strong>Velachery Zone at Risk:</strong> Prophet model forecasts 79% loss ratio next week based on IMD 7-day rainfall probability (68% chance of Red Alert). Recommend increasing zone risk multiplier from 2.1× to 2.4× before Monday pricing run.</div>
+        </div>
+        <div style="display:flex;gap:10px">
+          <button class="btn btn-primary">Apply 2.4× Multiplier for Velachery</button>
+          <button class="btn btn-outline">View Full Forecast Report</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════ FRAUD INTEL ════════ -->
+    <div id="panel-fraud" class="panel">
+      <div class="alert alert-warn">
+        <span style="font-size:18px">🚨</span>
+        <div><strong>2 Active Fraud Rings Detected:</strong> Isolation Forest has identified coordinated claim patterns in Velachery PIN 600042 and Hauz Khas PIN 110016. Manual review initiated. Total fraud blocked: ₹2.48L this month.</div>
+      </div>
+
+      <div class="stat-grid" style="margin-bottom:18px">
+        <div class="stat-card">
+          <div class="stat-stripe" style="background:var(--red)"></div>
+          <div class="stat-icon" style="background:var(--red-light)">🔍</div>
+          <div class="stat-label">Claims Analyzed</div>
+          <div class="stat-value">8,431</div>
+          <div class="stat-sub">This month</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-stripe" style="background:var(--green)"></div>
+          <div class="stat-icon" style="background:var(--green-light)">✅</div>
+          <div class="stat-label">Auto-Approved</div>
+          <div class="stat-value">8,192</div>
+          <div class="stat-change up">97.2% approval rate</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-stripe" style="background:var(--yellow)"></div>
+          <div class="stat-icon" style="background:var(--yellow-light)">🔍</div>
+          <div class="stat-label">Soft-Flagged</div>
+          <div class="stat-value">201</div>
+          <div class="stat-sub">4hr quick review</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-stripe" style="background:var(--red)"></div>
+          <div class="stat-icon" style="background:var(--red-light)">🚨</div>
+          <div class="stat-label">Fraud Rings</div>
+          <div class="stat-value" style="color:var(--red)">38</div>
+          <div class="stat-change dn">₹2.48L blocked</div>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="sec-title" style="margin-bottom:14px">🤖 7-Signal Effectiveness</div>
+          <div class="progress-row"><div class="progress-label">GPS zone match (15)</div><div class="progress-track"><div class="progress-fill" style="width:73%;background:var(--brand)"></div></div><div class="progress-val">73%</div></div>
+          <div class="progress-row"><div class="progress-label">Cell tower (20)</div><div class="progress-track"><div class="progress-fill" style="width:91%;background:var(--green)"></div></div><div class="progress-val">91%</div></div>
+          <div class="progress-row"><div class="progress-label">Accelerometer (20)</div><div class="progress-track"><div class="progress-fill" style="width:88%;background:var(--green)"></div></div><div class="progress-val">88%</div></div>
+          <div class="progress-row"><div class="progress-label">Order logs (15)</div><div class="progress-track"><div class="progress-fill" style="width:84%;background:var(--green)"></div></div><div class="progress-val">84%</div></div>
+          <div class="progress-row"><div class="progress-label">Cluster / Isolation (15)</div><div class="progress-track"><div class="progress-fill" style="width:97%;background:var(--green)"></div></div><div class="progress-val">97%</div></div>
+          <div class="progress-row"><div class="progress-label">Claim frequency (10)</div><div class="progress-track"><div class="progress-fill" style="width:82%;background:var(--green)"></div></div><div class="progress-val">82%</div></div>
+          <div class="progress-row"><div class="progress-label">IP geolocation (5)</div><div class="progress-track"><div class="progress-fill" style="width:71%;background:var(--yellow)"></div></div><div class="progress-val">71%</div></div>
+        </div>
+
+        <div class="card">
+          <div class="sec-title" style="margin-bottom:14px">🕵️ Active Fraud Rings</div>
+          <div style="border:1px solid var(--red-light);background:var(--red-light);border-radius:var(--r2);padding:14px;margin-bottom:10px">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+              <div style="font-weight:700;font-size:13px;color:var(--red)">Ring #FR-042 · Velachery 600042</div>
+              <span class="badge badge-red">Active</span>
+            </div>
+            <div style="font-size:12px;color:var(--gray600);line-height:1.6">
+              <strong>23 workers</strong> filing simultaneously · Accelerometer: all static · Cell towers: all show home base stations<br/>
+              <strong>Estimated blocked:</strong> ₹1.1L · <strong>GPS spoofed:</strong> Yes (confirmed)<br/>
+              Isolation Forest cluster score: <strong>0.94 anomaly</strong>
+            </div>
+            <div style="display:flex;gap:8px;margin-top:10px">
+              <button class="btn btn-danger" style="font-size:11px">Block All 23 Claims</button>
+              <button class="btn btn-outline" style="font-size:11px">Review Individually</button>
+            </div>
+          </div>
+          <div style="border:1px solid var(--yellow-light);background:var(--yellow-light);border-radius:var(--r2);padding:14px">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+              <div style="font-weight:700;font-size:13px;color:var(--yellow)">Ring #FR-041 · Hauz Khas 110016</div>
+              <span class="badge badge-yellow">Under Review</span>
+            </div>
+            <div style="font-size:12px;color:var(--gray600);line-height:1.6">
+              <strong>11 workers</strong> · Mixed signals · IP geolocation mismatch detected<br/>
+              <strong>Estimated at risk:</strong> ₹44,000 · <strong>Soft-flagged</strong> for 4hr review
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+</main><!-- /main -->
+</div><!-- /app -->
+
+<!-- ════════ MARKET CRASH PANEL (injected outside layout for full overlay feel) ════════ -->
+<div id="panel-marketcrash" class="panel" style="display:none;position:fixed;inset:0;z-index:200;overflow-y:auto;background:#FEF2F2">
+  <!-- Red emergency topbar -->
+  <div style="background:#DC2626;padding:0 28px;height:58px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10;box-shadow:0 4px 20px rgba(220,38,38,.4)">
+    <div style="display:flex;align-items:center;gap:14px">
+      <div style="font-size:22px;animation:pulse 1s infinite">🚨</div>
+      <div>
+        <div style="font-family:'Bricolage Grotesque',sans-serif;font-size:17px;font-weight:800;color:#fff;letter-spacing:-.2px">MARKET CRASH — CRITICAL INCIDENT ACTIVE</div>
+        <div style="font-size:11px;color:rgba(255,255,255,.75)">24-Hour Compliance Response · Phase 1 · March 20, 2026</div>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px">
+      <div id="mc-timer" style="font-family:monospace;font-size:20px;font-weight:700;color:#fff;background:rgba(0,0,0,.3);padding:6px 14px;border-radius:8px">23:59:47</div>
+      <button onclick="showPanel('fraud')" style="background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.4);color:#fff;padding:8px 16px;border-radius:8px;cursor:pointer;font-weight:600;font-size:12px;font-family:'Plus Jakarta Sans',sans-serif">← Back to Platform</button>
+    </div>
+  </div>
+
+  <div style="max-width:1100px;margin:0 auto;padding:28px 28px 60px">
+
+    <!-- Crisis banner -->
+    <div style="background:#fff;border:2px solid #DC2626;border-radius:16px;padding:24px 28px;margin-bottom:24px;position:relative;overflow:hidden">
+      <div style="position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,#DC2626,#F97316,#DC2626);background-size:200% 100%;animation:shimmer 2s linear infinite"></div>
+      @keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+      <div style="display:flex;align-items:flex-start;gap:16px">
+        <div style="font-size:40px;flex-shrink:0">⚠️</div>
+        <div style="flex:1">
+          <div style="font-family:'Bricolage Grotesque',sans-serif;font-size:20px;font-weight:800;color:#DC2626;margin-bottom:8px">THE CRISIS: GPS-Spoofing Syndicate Detected</div>
+          <div style="font-size:14px;color:#374151;line-height:1.7">
+            A sophisticated syndicate of <strong>500 delivery workers</strong> in a Tier-1 city — organizing via localized Telegram groups — is using advanced GPS-spoofing applications to fake their locations. While resting safely at home, they are tricking parametric insurance platforms into believing they are trapped in a severe Red Alert weather zone, triggering <strong>mass false payouts</strong> and instantly draining the liquidity pool.
+          </div>
+          <div style="display:flex;gap:10px;margin-top:14px;flex-wrap:wrap">
+            <div style="background:#FEF2F2;border:1px solid #FECACA;border-radius:10px;padding:10px 16px;text-align:center">
+              <div style="font-family:'Bricolage Grotesque',sans-serif;font-size:22px;font-weight:800;color:#DC2626">500</div>
+              <div style="font-size:10px;color:#6B7280;font-weight:600;text-transform:uppercase">Syndicate members</div>
+            </div>
+            <div style="background:#FEF2F2;border:1px solid #FECACA;border-radius:10px;padding:10px 16px;text-align:center">
+              <div style="font-family:'Bricolage Grotesque',sans-serif;font-size:22px;font-weight:800;color:#DC2626">₹14.2L</div>
+              <div style="font-size:10px;color:#6B7280;font-weight:600;text-transform:uppercase">False payouts at risk</div>
+            </div>
+            <div style="background:#FEF2F2;border:1px solid #FECACA;border-radius:10px;padding:10px 16px;text-align:center">
+              <div style="font-family:'Bricolage Grotesque',sans-serif;font-size:22px;font-weight:800;color:#DC2626">24 hrs</div>
+              <div style="font-size:10px;color:#6B7280;font-weight:600;text-transform:uppercase">To update architecture</div>
+            </div>
+            <div style="background:#ECFDF5;border:1px solid #BBF7D0;border-radius:10px;padding:10px 16px;text-align:center">
+              <div style="font-family:'Bricolage Grotesque',sans-serif;font-size:22px;font-weight:800;color:#0B9E52">IMMUNE</div>
+              <div style="font-size:10px;color:#6B7280;font-weight:600;text-transform:uppercase">GigShield status</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Why GigShield is immune -->
+    <div style="background:#ECFDF5;border:2px solid #BBF7D0;border-radius:16px;padding:22px 26px;margin-bottom:24px">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+        <div style="font-size:24px">🏛️</div>
+        <div style="font-family:'Bricolage Grotesque',sans-serif;font-size:17px;font-weight:800;color:#0B9E52">Why GigShield Cannot Be GPS-Spoofed — Architectural Immunity</div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+        <div style="background:#fff;border:1px solid #BBF7D0;border-radius:12px;padding:16px">
+          <div style="font-size:11px;font-weight:700;color:#DC2626;text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px">❌ Traditional Platform (Spoofable)</div>
+          <div style="display:flex;flex-direction:column;gap:6px">
+            <div style="display:flex;align-items:center;gap:8px;padding:8px;background:#FEF2F2;border-radius:8px;font-size:12px;color:#374151">
+              <span style="color:#DC2626;font-weight:700">1</span> Worker reports GPS location
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;padding:8px;background:#FEF2F2;border-radius:8px;font-size:12px;color:#374151">
+              <span style="color:#DC2626;font-weight:700">2</span> GPS verified as "in zone"
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;padding:8px;background:#FEF2F2;border-radius:8px;font-size:12px;color:#374151">
+              <span style="color:#DC2626;font-weight:700">3</span> Payout triggered → <strong>Fraud succeeds</strong> 💀
+            </div>
+          </div>
+        </div>
+        <div style="background:#fff;border:1px solid #BBF7D0;border-radius:12px;padding:16px">
+          <div style="font-size:11px;font-weight:700;color:#0B9E52;text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px">✅ GigShield (Spoofing-Resistant)</div>
+          <div style="display:flex;flex-direction:column;gap:6px">
+            <div style="display:flex;align-items:center;gap:8px;padding:8px;background:#ECFDF5;border-radius:8px;font-size:12px;color:#374151">
+              <span style="color:#0B9E52;font-weight:700">1</span> IMD/CPCB gov API crosses threshold
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;padding:8px;background:#ECFDF5;border-radius:8px;font-size:12px;color:#374151">
+              <span style="color:#0B9E52;font-weight:700">2</span> Claims initiated system-wide
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;padding:8px;background:#ECFDF5;border-radius:8px;font-size:12px;color:#374151">
+              <span style="color:#0B9E52;font-weight:700">3</span> 7-signal fraud scored (GPS = only 15%)
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;padding:8px;background:#ECFDF5;border-radius:8px;font-size:12px;color:#374151">
+              <span style="color:#0B9E52;font-weight:700">4</span> Ring detected → Blocked ✓
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style="margin-top:14px;padding:12px 16px;background:#fff;border-radius:10px;border:1px solid #BBF7D0;font-size:13px;color:#374151;line-height:1.6">
+        🔑 <strong>Key insight:</strong> The parametric TRIGGER is sourced from IMD and CPCB government servers. A Telegram fraud ring cannot alter what the Indian Meteorological Department records about rainfall in Velachery. GPS is only <strong>Signal #1 of 7</strong> in post-trigger fraud scoring, weighted at just <strong>15 of 100 points</strong>.
+      </div>
+    </div>
+
+    <!-- Live Syndicate Response Simulation -->
+    <div style="background:#fff;border:1.5px solid #E5E7EB;border-radius:16px;padding:22px 26px;margin-bottom:24px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px">
+        <div>
+          <div style="font-family:'Bricolage Grotesque',sans-serif;font-size:16px;font-weight:800;color:#111827">🎯 Live Syndicate Attack Simulation</div>
+          <div style="font-size:12px;color:#6B7280;margin-top:2px">Watch GigShield's 7-signal system neutralize a coordinated GPS-spoofing ring in real time</div>
+        </div>
+        <button id="mc-sim-btn" onclick="runSyndicateSimulation()" style="background:linear-gradient(135deg,#DC2626,#B91C1C);color:#fff;border:none;padding:10px 20px;border-radius:10px;font-weight:700;font-size:13px;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;box-shadow:0 4px 12px rgba(220,38,38,.35)">
+          ▶ Simulate Attack
+        </button>
+      </div>
+
+      <div id="mc-sim-feed" style="background:#F9FAFB;border-radius:10px;border:1px solid #E5E7EB;padding:16px;min-height:100px;font-size:12px;font-family:monospace;color:#374151;line-height:1.8">
+        <span style="color:#9CA3AF">// Simulation idle. Click "Simulate Attack" to begin.</span>
+      </div>
+
+      <div id="mc-verdict" style="display:none;margin-top:14px;background:#ECFDF5;border:2px solid #0B9E52;border-radius:12px;padding:16px 20px">
+        <div style="font-family:'Bricolage Grotesque',sans-serif;font-size:16px;font-weight:800;color:#0B9E52;margin-bottom:6px">✅ Attack Neutralized — GigShield Defended</div>
+        <div style="font-size:13px;color:#374151;line-height:1.6">All 500 fraudulent claims detected and blocked. <strong>₹14.2L</strong> in false payouts prevented. Zero legitimate worker claims affected. Isolation Forest cluster score: <strong>0.97 anomaly</strong>. Ring details forwarded to compliance team.</div>
+        <div style="display:flex;gap:8px;margin-top:12px">
+          <button style="background:#0B9E52;color:#fff;border:none;padding:8px 16px;border-radius:8px;font-weight:600;font-size:12px;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif">📋 Export Compliance Report</button>
+          <button style="background:#fff;border:1px solid #E5E7EB;color:#374151;padding:8px 16px;border-radius:8px;font-weight:600;font-size:12px;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif">📤 Flag to IRDAI</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3-Part Compliance Response -->
+    <div style="font-family:'Bricolage Grotesque',sans-serif;font-size:17px;font-weight:800;color:#111827;margin-bottom:14px">📋 Adversarial Defense & Anti-Spoofing Strategy — Our 24-Hour Response</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:24px">
+
+      <!-- Card 1: Differentiation -->
+      <div style="background:#fff;border:1.5px solid #E5E7EB;border-radius:14px;padding:18px">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+          <div style="width:32px;height:32px;background:#EBF5FF;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px">🔬</div>
+          <div style="font-family:'Bricolage Grotesque',sans-serif;font-size:14px;font-weight:700">1. The Differentiation</div>
+        </div>
+        <div style="font-size:12px;color:#374151;line-height:1.7;margin-bottom:12px">How our AI/ML tells apart a <strong>genuinely stranded worker</strong> vs a <strong>bad actor at home spoofing GPS</strong>:</div>
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <div style="background:#F9FAFB;border-radius:7px;padding:8px 10px;font-size:11px;color:#374151;border-left:3px solid #0B9E52"><strong style="color:#0B9E52">Genuine worker:</strong> Accelerometer shows continuous motion (≥0.3 m/s²), cell towers match active delivery route, platform app shows zero available orders in zone</div>
+          <div style="background:#F9FAFB;border-radius:7px;padding:8px 10px;font-size:11px;color:#374151;border-left:3px solid #DC2626"><strong style="color:#DC2626">Bad actor:</strong> Accelerometer static (&lt;0.1 m/s² for 4+ hrs), home Wi-Fi base station ID detected, platform order logs show orders being rejected not absent</div>
+          <div style="background:#ECFDF5;border-radius:7px;padding:8px 10px;font-size:11px;color:#374151;border-left:3px solid #0B9E52"><strong style="color:#0B9E52">Ring detection:</strong> Isolation Forest flags ≥20 simultaneous claims from same 6-digit PIN in 30 min as 0.9+ anomaly score</div>
+        </div>
+      </div>
+
+      <!-- Card 2: The Data -->
+      <div style="background:#fff;border:1.5px solid #E5E7EB;border-radius:14px;padding:18px">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+          <div style="width:32px;height:32px;background:#FFF3EE;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px">📡</div>
+          <div style="font-family:'Bricolage Grotesque',sans-serif;font-size:14px;font-weight:700">2. The Data</div>
+        </div>
+        <div style="font-size:12px;color:#374151;line-height:1.7;margin-bottom:12px">7 data signals <strong>beyond GPS coordinates</strong> analyzed per claim:</div>
+        <div style="display:flex;flex-direction:column;gap:5px">
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 9px;background:#F9FAFB;border-radius:6px;font-size:11px">
+            <span>📶 Cell tower trajectory</span><span style="font-weight:700;color:#374151">20 pts</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 9px;background:#F9FAFB;border-radius:6px;font-size:11px">
+            <span>📳 Accelerometer variance</span><span style="font-weight:700;color:#374151">20 pts</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 9px;background:#F9FAFB;border-radius:6px;font-size:11px">
+            <span>📍 GPS zone match</span><span style="font-weight:700;color:#374151">15 pts only</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 9px;background:#F9FAFB;border-radius:6px;font-size:11px">
+            <span>📦 Platform order logs</span><span style="font-weight:700;color:#374151">15 pts</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 9px;background:#F9FAFB;border-radius:6px;font-size:11px">
+            <span>🕸️ Cluster anomaly (IF)</span><span style="font-weight:700;color:#374151">15 pts</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 9px;background:#F9FAFB;border-radius:6px;font-size:11px">
+            <span>📊 Claim frequency</span><span style="font-weight:700;color:#374151">10 pts</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 9px;background:#F9FAFB;border-radius:6px;font-size:11px">
+            <span>🌐 IP geolocation delta</span><span style="font-weight:700;color:#374151">5 pts</span>
+          </div>
+        </div>
+        <div style="margin-top:8px;padding:7px 10px;background:#FFF3EE;border-radius:7px;font-size:11px;color:#FF6B35;font-weight:600">
+          All 7 must align simultaneously — exponentially harder to fake
+        </div>
+      </div>
+
+      <!-- Card 3: UX Balance -->
+      <div style="background:#fff;border:1.5px solid #E5E7EB;border-radius:14px;padding:18px">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+          <div style="width:32px;height:32px;background:#ECFDF5;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px">⚖️</div>
+          <div style="font-family:'Bricolage Grotesque',sans-serif;font-size:14px;font-weight:700">3. The UX Balance</div>
+        </div>
+        <div style="font-size:12px;color:#374151;line-height:1.7;margin-bottom:12px">How <strong>flagged claims</strong> are handled without penalizing honest workers:</div>
+        <div style="display:flex;flex-direction:column;gap:7px">
+          <div style="background:#ECFDF5;border-radius:8px;padding:9px 11px;border-left:3px solid #0B9E52">
+            <div style="font-size:11px;font-weight:700;color:#0B9E52">Score ≥70 → Instant auto-approve</div>
+            <div style="font-size:11px;color:#374151;margin-top:2px">"₹450 credited to your UPI ✓" — zero friction</div>
+          </div>
+          <div style="background:#FFFBEB;border-radius:8px;padding:9px 11px;border-left:3px solid #D97706">
+            <div style="font-size:11px;font-weight:700;color:#D97706">Score 40–69 → Soft flag, 4hr review</div>
+            <div style="font-size:11px;color:#374151;margin-top:2px">"Under quick review — payment NOT blocked" — proceeds if cleared</div>
+          </div>
+          <div style="background:#FEF2F2;border-radius:8px;padding:9px 11px;border-left:3px solid #DC2626">
+            <div style="font-size:11px;font-weight:700;color:#DC2626">Score &lt;40 → Hold + appeal flow</div>
+            <div style="font-size:11px;color:#374151;margin-top:2px">One-tap photo/video appeal · First offence = warning only</div>
+          </div>
+          <div style="background:#EBF5FF;border-radius:8px;padding:9px 11px;border-left:3px solid #1A56DB">
+            <div style="font-size:11px;font-weight:700;color:#1A56DB">Network drop → Auto-cleared</div>
+            <div style="font-size:11px;color:#374151;margin-top:2px">GPS loss in bad weather + cell tower confirms zone → no penalty</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Compliance status bar -->
+    <div style="background:#fff;border:1.5px solid #E5E7EB;border-radius:14px;padding:18px 22px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
+      <div>
+        <div style="font-family:'Bricolage Grotesque',sans-serif;font-size:15px;font-weight:700;color:#111827">📋 24-Hour Compliance Checklist</div>
+        <div style="font-size:12px;color:#6B7280;margin-top:2px">All 3 required sections addressed in README update</div>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <span style="background:#ECFDF5;border:1px solid #BBF7D0;border-radius:8px;padding:7px 13px;font-size:12px;font-weight:700;color:#0B9E52">✓ Differentiation logic</span>
+        <span style="background:#ECFDF5;border:1px solid #BBF7D0;border-radius:8px;padding:7px 13px;font-size:12px;font-weight:700;color:#0B9E52">✓ 7 data signals beyond GPS</span>
+        <span style="background:#ECFDF5;border:1px solid #BBF7D0;border-radius:8px;padding:7px 13px;font-size:12px;font-weight:700;color:#0B9E52">✓ UX balance for honest workers</span>
+        <span style="background:#ECFDF5;border:1px solid #BBF7D0;border-radius:8px;padding:7px 13px;font-size:12px;font-weight:700;color:#0B9E52">✓ README updated</span>
+      </div>
+    </div>
+
+  </div><!-- /inner -->
+</div><!-- /market crash panel -->
+
+<!-- Notification Toast -->
+<div id="notif" style="display:none" class="notif">
+  <div class="notif-title" id="notif-title"></div>
+  <div class="notif-body" id="notif-body"></div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════════════════════════════
+const PAGE_TITLES = {
+  overview:'Platform Dashboard', demo:'Live Demo — AutoPay Engine',
+  onboarding:'Worker Onboarding', worker:'My Policy', claims:'My Claims',
+  ai:'AI Assistant (Claude)', insurer:'Loss Analytics — Insurer Admin',
+  fraud:'Fraud Intelligence', marketcrash:'🚨 Market Crash — Critical Incident'
+};
+
+function showPanel(id) {
+  // Handle market crash as full-screen overlay
+  const mc = document.getElementById('panel-marketcrash');
+  if(id === 'marketcrash') {
+    mc.style.display = 'block';
+    document.body.style.overflow = 'hidden';
+    startMarketCrashTimer();
+    return;
+  }
+  // Hide market crash overlay if open
+  mc.style.display = 'none';
+  document.body.style.overflow = '';
+
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  const target = document.getElementById('panel-'+id);
+  if(target) target.classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('pg-title').textContent = PAGE_TITLES[id] || id;
+  document.querySelectorAll('.nav-item').forEach(n => {
+    if(n.getAttribute('onclick') && n.getAttribute('onclick').includes("'"+id+"'")) n.classList.add('active');
+  });
+}
+
+// ─── MARKET CRASH TIMER ──────────────────────────────────
+let mcTimerInterval = null;
+let mcSeconds = 86387; // 23:59:47
+function startMarketCrashTimer() {
+  if(mcTimerInterval) return;
+  mcTimerInterval = setInterval(() => {
+    if(mcSeconds <= 0) { clearInterval(mcTimerInterval); return; }
+    mcSeconds--;
+    const h = String(Math.floor(mcSeconds/3600)).padStart(2,'0');
+    const m = String(Math.floor((mcSeconds%3600)/60)).padStart(2,'0');
+    const s = String(mcSeconds%60).padStart(2,'0');
+    const el = document.getElementById('mc-timer');
+    if(el) {
+      el.textContent = `${h}:${m}:${s}`;
+      if(mcSeconds < 3600) el.style.color = '#FCA5A5';
+      if(mcSeconds < 600)  el.style.animation = 'pulse 0.5s infinite';
+    }
+  }, 1000);
+}
+
+// ─── SYNDICATE SIMULATION ────────────────────────────────
+let simRunning = false;
+function runSyndicateSimulation() {
+  if(simRunning) return;
+  simRunning = true;
+  document.getElementById('mc-sim-btn').disabled = true;
+  document.getElementById('mc-sim-btn').textContent = '⟳ Simulating...';
+  document.getElementById('mc-verdict').style.display = 'none';
+  const feed = document.getElementById('mc-sim-feed');
+  feed.innerHTML = '';
+
+  const lines = [
+    {d:0,   col:'#DC2626', text:'[00:00] 🚨 ALERT: 500 simultaneous claim requests received from PIN 600042'},
+    {d:500,  col:'#D97706', text:'[00:01] 📍 GPS coordinates: all 500 workers report being at Velachery flood zone'},
+    {d:1000, col:'#1A56DB', text:'[00:02] 🏛️ IMD API check: Rainfall confirmed 78.4mm/3hr — trigger IS legitimate'},
+    {d:1500, col:'#1A56DB', text:'[00:03] 🤖 7-signal fraud engine activated — running parallel analysis on 500 claims...'},
+    {d:2000, col:'#0B9E52', text:'[00:04] 📡 Cell tower check: 487 workers show HOME base station (indoor, not outdoor delivery route)'},
+    {d:2500, col:'#0B9E52', text:'[00:05] 📳 Accelerometer: 493 workers show <0.1 m/s² — stationary at home, not riding'},
+    {d:3000, col:'#0B9E52', text:'[00:06] 📦 Platform order logs: Swiggy shows orders ARE available in zone — workers not accepting'},
+    {d:3500, col:'#DC2626', text:'[00:07] 🕸️ Isolation Forest: CLUSTER ANOMALY 0.97 — 500 simultaneous claims, same PIN, static sensors'},
+    {d:4000, col:'#DC2626', text:'[00:08] 🌐 IP geolocation: 468 workers connected via home broadband subnet, not mobile data'},
+    {d:4400, col:'#DC2626', text:'[00:09] ⚡ COMPOSITE FRAUD SCORE: 8.2/100 — HARD BLOCK TRIGGERED'},
+    {d:4800, col:'#0B9E52', text:'[00:10] ✅ All 500 fraudulent claims BLOCKED — ₹14.2L in false payouts prevented'},
+    {d:5100, col:'#0B9E52', text:'[00:11] 📱 Honest workers (score ≥70) in same zone: PAYOUTS PROCEEDING normally — unaffected'},
+    {d:5400, col:'#0B9E52', text:'[00:12] 📋 Ring #FR-043 documented — forwarding to IRDAI compliance team'},
+  ];
+
+  lines.forEach(l => setTimeout(() => {
+    const line = document.createElement('div');
+    line.style.cssText = `color:${l.col};animation:fadeIn .3s ease`;
+    line.textContent = l.text;
+    feed.appendChild(line);
+    feed.scrollTop = feed.scrollHeight;
+  }, l.d));
+
+  setTimeout(() => {
+    document.getElementById('mc-verdict').style.display = 'block';
+    document.getElementById('mc-sim-btn').disabled = false;
+    document.getElementById('mc-sim-btn').textContent = '↺ Run Again';
+    simRunning = false;
+  }, 5800);
+}
+
+// ═══════════════════════════════════════════════════════
+// CHARTS
+// ═══════════════════════════════════════════════════════
+function initCharts() {
+  const font = "'Plus Jakarta Sans', sans-serif";
+  const brand = '#FF6B35', blue = '#1A56DB', green = '#0B9E52', red = '#DC2626', gray = '#E5E7EB';
+
+  new Chart(document.getElementById('chart-claims'), {
+    type:'bar',
+    data:{
+      labels:['W8','W7','W6','W5','W4','W3','W2','W1'],
+      datasets:[
+        {label:'Auto-Approved',data:[412,389,502,445,580,621,698,839],backgroundColor:green+'CC',borderRadius:5},
+        {label:'Flagged',data:[18,12,24,15,22,19,27,8],backgroundColor:red+'CC',borderRadius:5}
+      ]
+    },
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{font:{family:font},boxWidth:10,padding:12}}},
+      scales:{x:{grid:{color:gray+'55'},ticks:{font:{family:font}}},y:{grid:{color:gray+'55'},ticks:{font:{family:font}}}},barPercentage:.7}
+  });
+
+  new Chart(document.getElementById('chart-zones'), {
+    type:'doughnut',
+    data:{
+      labels:['Velachery (79%)','Hauz Khas (55%)','Koramangala (55%)','Andheri (65%)'],
+      datasets:[{data:[79,55,55,65],backgroundColor:[red,green,blue,brand],borderWidth:0,hoverOffset:6}]
+    },
+    options:{responsive:true,maintainAspectRatio:false,cutout:'65%',
+      plugins:{legend:{position:'right',labels:{font:{family:font},boxWidth:10,padding:14}}}}
+  });
+
+  new Chart(document.getElementById('chart-wiis'), {
+    type:'bar',
+    data:{
+      labels:['<40 (Trust)','40-59 (Bronze)','60-79 (Silver)','80-100 (Gold)'],
+      datasets:[{label:'Workers',data:[640,1820,3580,1352],backgroundColor:[gray,brand+'99',blue+'99',green+'BB'],borderRadius:6}]
+    },
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
+      scales:{x:{grid:{display:false},ticks:{font:{family:font,size:10}}},y:{grid:{color:gray+'55'},ticks:{font:{family:font}}}}}
+  });
+
+  new Chart(document.getElementById('chart-loss'), {
+    type:'line',
+    data:{
+      labels:['W8','W7','W6','W5','W4','W3','W2','W1','Fcst'],
+      datasets:[
+        {label:'Loss Ratio %',data:[54,58,61,57,60,63,58,58,62],borderColor:brand,backgroundColor:brand+'18',fill:true,tension:.4,pointRadius:4,pointBackgroundColor:brand,borderWidth:2.5},
+        {label:'Target (65%)',data:[65,65,65,65,65,65,65,65,65],borderColor:gray,borderDash:[5,4],pointRadius:0,borderWidth:1.5}
+      ]
+    },
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{labels:{font:{family:font},boxWidth:10}}},
+      scales:{x:{grid:{color:gray+'55'},ticks:{font:{family:font}}},y:{grid:{color:gray+'55'},ticks:{font:{family:font},callback:v=>v+'%'},min:40,max:80}}}
+  });
+}
+
+// ═══════════════════════════════════════════════════════
+// LIVE DEMO
+// ═══════════════════════════════════════════════════════
+let demoRunning = false;
+
+function triggerDemo(type) {
+  if(demoRunning) return;
+  demoRunning = true;
+  document.querySelectorAll('.trigger-btn').forEach(b => b.disabled = true);
+
+  const cfg = {
+    rain:  {label:'🌧️ Red Alert Rainfall — Velachery, Chennai',val:'78.4mm/3hr (IMD)',workers:847,approved:839,soft:6,hard:2,payout:450},
+    aqi:   {label:'🌫️ Severe AQI 312 — Hauz Khas, Delhi',     val:'AQI 312 (CPCB)',  workers:891,approved:880,soft:8,hard:3,payout:380},
+    heat:  {label:'🌡️ Heat Wave 45.2°C — Banjara Hills, Hyd', val:'45.2°C (IMD)',    workers:678,approved:664,soft:10,hard:4,payout:420},
+  };
+  const c = cfg[type];
+  const stat = document.getElementById('pipeline-status');
+  stat.className = 'badge badge-yellow'; stat.textContent = '⟳ Processing...';
+  document.getElementById('demo-results').style.display = 'none';
+  const feed = document.getElementById('pipeline-feed'); feed.innerHTML = '';
+
+  const steps = [
+    {d:100,  dot:'#1A56DB',text:`<strong>${c.label}</strong> — threshold crossed`},
+    {d:700,  dot:'#0B9E52',text:`📡 IMD/CPCB government API confirmed (${c.val}) — <strong>cannot be GPS-spoofed</strong>`},
+    {d:1300, dot:'#1A56DB',text:`📋 <strong>${c.workers}</strong> active policies found in affected zone — batch claim engine initiated`},
+    {d:1900, dot:'#D97706',text:`🤖 7-signal fraud detection running on all ${c.workers} claims in parallel (Isolation Forest active)...`},
+    {d:2500, dot:'#0B9E52',text:`✅ <strong>${c.approved} claims auto-approved</strong> — composite fraud score ≥70 — payout queued`},
+    {d:3000, dot:'#D97706',text:`🔍 ${c.soft} claims soft-flagged — 4hr quick review initiated, payment <strong>not blocked</strong>`},
+    {d:3400, dot:'#DC2626',text:`🚨 ${c.hard} claims hard-flagged — Isolation Forest detected coordinated ring activity — blocked`},
+    {d:3800, dot:'#0B9E52',text:`💸 <strong>₹${(c.approved*c.payout).toLocaleString()}</strong> queued via Razorpay sandbox UPI — processing`},
+    {d:4200, dot:'#7C3AED',text:`📱 Rajan Kumar notified: "₹${c.payout} credited to rajan@oksbi within 2 hours"`},
+    {d:4600, dot:'#0B9E52',text:`⏱️ Complete — all ${c.workers} workers processed in <strong>1.8 seconds</strong>`},
+  ];
+
+  steps.forEach(s => setTimeout(() => {
+    const el = document.createElement('div');
+    el.className = 'feed-item';
+    el.innerHTML = `<div class="feed-dot" style="background:${s.dot}"></div><div><div class="feed-text">${s.text}</div></div>`;
+    feed.appendChild(el); feed.scrollTop = feed.scrollHeight;
+  }, s.d));
+
+  setTimeout(() => {
+    stat.className = 'badge badge-green'; stat.textContent = '✓ Complete';
+    document.getElementById('demo-metrics').innerHTML = [
+      `<div class="stat-card"><div class="stat-stripe" style="background:var(--blue)"></div><div class="stat-label">Policies Activated</div><div class="stat-value" style="color:var(--blue)">${c.workers.toLocaleString()}</div><div class="stat-sub">In disruption zone</div></div>`,
+      `<div class="stat-card"><div class="stat-stripe" style="background:var(--green)"></div><div class="stat-label">Auto-Approved</div><div class="stat-value" style="color:var(--green)">${c.approved}</div><div class="stat-change up">${((c.approved/c.workers)*100).toFixed(1)}% rate</div></div>`,
+      `<div class="stat-card"><div class="stat-stripe" style="background:var(--yellow)"></div><div class="stat-label">Under Review</div><div class="stat-value" style="color:var(--yellow)">${c.soft}</div><div class="stat-sub">4hr · not blocked</div></div>`,
+      `<div class="stat-card"><div class="stat-stripe" style="background:var(--red)"></div><div class="stat-label">Fraud Blocked</div><div class="stat-value" style="color:var(--red)">${c.hard}</div><div class="stat-sub">₹${(c.hard*c.payout).toLocaleString()} saved</div></div>`,
+      `<div class="stat-card"><div class="stat-stripe" style="background:var(--green)"></div><div class="stat-label">Total Payout</div><div class="stat-value" style="color:var(--green)">₹${(c.approved*c.payout).toLocaleString()}</div><div class="stat-sub">Via UPI</div></div>`,
+      `<div class="stat-card"><div class="stat-stripe" style="background:var(--brand)"></div><div class="stat-label">Processing Time</div><div class="stat-value" style="color:var(--brand)">1.8s</div><div class="stat-sub">All ${c.workers} workers</div></div>`
+    ].join('');
+
+    document.getElementById('fraud-breakdown').innerHTML = `
+      <div class="progress-row"><div class="progress-label">GPS zone match</div><div class="progress-track"><div class="progress-fill" style="width:87%;background:var(--green)"></div></div><div class="progress-val">13/15</div></div>
+      <div class="progress-row"><div class="progress-label">Cell tower pattern</div><div class="progress-track"><div class="progress-fill" style="width:85%;background:var(--green)"></div></div><div class="progress-val">17/20</div></div>
+      <div class="progress-row"><div class="progress-label">Accelerometer</div><div class="progress-track"><div class="progress-fill" style="width:80%;background:var(--green)"></div></div><div class="progress-val">16/20</div></div>
+      <div class="progress-row"><div class="progress-label">Platform order logs</div><div class="progress-track"><div class="progress-fill" style="width:80%;background:var(--green)"></div></div><div class="progress-val">12/15</div></div>
+      <div class="progress-row"><div class="progress-label">Cluster anomaly</div><div class="progress-track"><div class="progress-fill" style="width:53%;background:var(--red)"></div></div><div class="progress-val" style="color:var(--red)">8/15</div></div>
+      <div class="progress-row"><div class="progress-label">Claim frequency</div><div class="progress-track"><div class="progress-fill" style="width:80%;background:var(--green)"></div></div><div class="progress-val">8/10</div></div>
+      <div class="progress-row"><div class="progress-label">IP geolocation</div><div class="progress-track"><div class="progress-fill" style="width:80%;background:var(--green)"></div></div><div class="progress-val">4/5</div></div>
+      <div style="margin-top:12px;padding:12px 16px;background:var(--green-light);border-radius:var(--r);border:1px solid #BBF7D0;display:flex;justify-content:space-between;align-items:center">
+        <span style="font-size:13px;color:var(--green);font-weight:600">Composite Score (avg)</span>
+        <span style="font-family:var(--font-display);font-size:22px;font-weight:800;color:var(--green)">78.4 / 100 ✓</span>
+      </div>`;
+
+    document.getElementById('rajan-msg').innerHTML = `
+      <div style="font-size:16px;font-weight:800;color:var(--green);margin-bottom:8px">₹${c.payout} credited to your UPI ✅</div>
+      <div style="color:var(--gray700);margin-bottom:10px">Your income protection claim has been automatically processed by GigShield AI.</div>
+      <div style="font-size:12px;color:var(--gray500);background:var(--white);border-radius:8px;padding:10px;border:1px solid var(--gray200)">
+        <strong>Trigger:</strong> ${c.val}<br/>
+        <strong>Fraud score:</strong> 78.4/100 — Auto-approved<br/>
+        <strong>UPI Ref:</strong> GS_${Date.now().toString().slice(-8)}<br/>
+        <strong>Credited to:</strong> rajan@oksbi
+      </div>`;
+
+    document.getElementById('demo-results').style.display = 'block';
+    showNotif('✅ GigShield AutoPay Complete', `₹${c.payout} credited to Rajan's UPI. ${c.approved} workers paid. ${c.hard} fraud rings blocked.`);
+    document.querySelectorAll('.trigger-btn').forEach(b => b.disabled = false);
+    demoRunning = false;
+  }, 5200);
+}
+
+// ═══════════════════════════════════════════════════════
+// PREMIUM CALCULATOR
+// ═══════════════════════════════════════════════════════
+function recalcPremium() {
+  const income = parseInt(document.getElementById('f-income').value) || 800;
+  const zone = document.getElementById('f-zone').value;
+  const riskMap = {velachery:2.1,andheri:2.0,koramangala:1.5,'hauz-khas':1.2};
+  const risk = riskMap[zone] || 1.5;
+  const weatherMult = zone === 'velachery' ? 1.35 : 1.1;
+  const premium = Math.round(30 * risk * weatherMult);
+  const coverage = Math.round((income / 10) * 4 * 2);
+  document.getElementById('calc-premium').textContent = '₹' + premium;
+  document.getElementById('calc-coverage').textContent = '₹' + coverage.toLocaleString();
+}
+
+// ═══════════════════════════════════════════════════════
+// ONBOARDING
+// ═══════════════════════════════════════════════════════
+function completeOnboarding() {
+  const name = document.getElementById('f-name').value || 'Worker';
+  const premium = document.getElementById('calc-premium').textContent;
+  showNotif(`🛡️ Welcome, ${name}!`, `GigShield active! Weekly ${premium}. Auto-pay every Sunday. First disruption = instant UPI payout.`);
+  setTimeout(() => showPanel('worker'), 1800);
+}
+
+// ═══════════════════════════════════════════════════════
+// REAL CLAUDE AI CHAT
+// ═══════════════════════════════════════════════════════
+const SYSTEM_PROMPT = `You are the GigShield AI assistant — a friendly, expert insurance advisor for India's gig delivery workers. GigShield is a parametric income protection platform built for food delivery partners (Swiggy, Zomato, Zepto, Blinkit, Amazon Flex).
+
+KEY FACTS about GigShield:
+- Weekly premium: ₹20–₹150/week, calculated by XGBoost model. Rajan Kumar's premium = ₹65/week
+- Coverage: up to ₹1,600/week for Rajan (based on ₹800/day income × 2 disruption days × multipliers)
+- 5 parametric triggers: Red Alert Rainfall (IMD ≥64mm/3hr), Severe AQI (CPCB ≥300), Platform Outage (>30min), Curfew/Bandh (NLP detected), Extreme Heat/Cold (IMD)
+- WIIS Score: 0–100 portable gig reputation score. Rajan's score = 74 (Silver). Gold tier requires 80+.
+- 7-signal fraud detection: GPS (15pts), Cell tower (20pts), Accelerometer (20pts), Order logs (15pts), Cluster Isolation Forest (15pts), Claim frequency (10pts), IP geolocation (5pts)
+- Payouts via Razorpay UPI within 2 hours, automated, no manual filing needed
+- Coverage is ONLY for lost income, NOT health, accidents, or vehicle repair
+- The platform is GPS-spoofing resistant because triggers come from government APIs (IMD/CPCB), not worker GPS
+
+Be concise, warm, specific, and always relate answers to Rajan's actual numbers when relevant. Use ₹ symbols and concrete figures. Keep responses under 150 words. Never hallucinate features that don't exist.`;
+
+async function sendChat() {
+  const input = document.getElementById('chat-input');
+  const msg = input.value.trim();
+  if(!msg) return;
+  input.value = '';
+  appendMsg(msg, 'user');
+  const loadId = appendLoader();
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:300,
+        system: SYSTEM_PROMPT,
+        messages:[{role:'user',content:msg}]
+      })
+    });
+    const data = await res.json();
+    removeLoader(loadId);
+    const reply = data.content?.[0]?.text || 'I had trouble connecting. Please try again!';
+    appendMsg(reply, 'ai');
+  } catch(e) {
+    removeLoader(loadId);
+    appendMsg('I\'m having connectivity issues right now. But I\'m still here to help — your policy is active and all 5 triggers are monitoring Velachery for you!', 'ai');
+  }
+}
+
+function quickChat(msg) {
+  document.getElementById('chat-input').value = msg;
+  sendChat();
+}
+
+function appendMsg(text, from) {
+  const box = document.getElementById('chat-box');
+  const div = document.createElement('div');
+  div.className = 'msg msg-' + from;
+  div.innerHTML = text.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br/>');
+  box.appendChild(div);
+  box.scrollTop = box.scrollHeight;
+}
+
+let loaderCount = 0;
+function appendLoader() {
+  const id = 'loader-' + (++loaderCount);
+  const box = document.getElementById('chat-box');
+  const div = document.createElement('div');
+  div.id = id; div.className = 'msg msg-ai msg-loading';
+  div.innerHTML = '<div class="dot-bounce"></div><div class="dot-bounce"></div><div class="dot-bounce"></div>';
+  box.appendChild(div); box.scrollTop = box.scrollHeight;
+  return id;
+}
+function removeLoader(id) { document.getElementById(id)?.remove(); }
+
+// ═══════════════════════════════════════════════════════
+// NOTIFICATION
+// ═══════════════════════════════════════════════════════
+function showNotif(title, body) {
+  document.getElementById('notif-title').textContent = title;
+  document.getElementById('notif-body').textContent = body;
+  const n = document.getElementById('notif'); n.style.display = 'block';
+  setTimeout(() => n.style.display = 'none', 6000);
+}
+
+// ═══════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════
+window.addEventListener('load', () => {
+  initCharts();
+  setInterval(() => {
+    const el = document.getElementById('m-workers');
+    if(el) el.textContent = (7392 + Math.floor(Math.random()*6)).toLocaleString();
+  }, 7000);
+});
+</script>
+</body>
+</html>
